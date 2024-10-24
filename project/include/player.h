@@ -4,16 +4,16 @@
 #include <SDL2/SDL.h>
 
 /**
- * @brief Estrutura que representa a posição de um objeto ou personagem no jogo.
+ * @brief Structure that represents the position of an object or character in the game.
  * 
- * A estrutura Posicao armazena as coordenadas x e y, onde:
- * - x: Coordenada horizontal.
- * - y: Coordenada vertical.
+ * The Position structure stores the x and y coordinates, where:
+ * - x: Horizontal coordinate.
+ * - y: Vertical coordinate.
  */
 typedef struct {
-    int x; ///< Coordenada horizontal (posição x).
-    int y; ///< Coordenada vertical (posição y).
-} Posicao;
+    int x; ///< Horizontal coordinate (x position).
+    int y; ///< Vertical coordinate (y position).
+} Position;
 
 /**
  * @brief Initializes the player.
@@ -24,7 +24,6 @@ typedef struct {
  */
 void initPlayer();
 
-
 /**
  * @brief Updates the player's state.
  *
@@ -33,7 +32,6 @@ void initPlayer();
  * regularly to ensure the player's state is kept up-to-date.
  */
 void updatePlayer();
-
 
 /**
  * @brief Renders the player on the screen.
@@ -55,31 +53,31 @@ void renderPlayer();
 void handlePlayerInput(SDL_Event *event);
 
 /**
- * @brief Move o objeto para cima, diminuindo o valor de y.
+ * @brief Moves the object up, decreasing the y value.
  * 
- * @param pos Ponteiro para a estrutura Posicao a ser alterada.
+ * @param pos Pointer to the Position structure to be modified.
  */
-void mover_para_cima(Posicao* pos);
+void moveUp(Position* pos);
 
 /**
- * @brief Move o objeto para baixo, aumentando o valor de y.
+ * @brief Moves the object down, increasing the y value.
  * 
- * @param pos Ponteiro para a estrutura Posicao a ser alterada.
+ * @param pos Pointer to the Position structure to be modified.
  */
-void mover_para_baixo(Posicao* pos);
+void moveDown(Position* pos);
 
 /**
- * @brief Move o objeto para a esquerda, diminuindo o valor de x.
+ * @brief Moves the object to the left, decreasing the x value.
  * 
- * @param pos Ponteiro para a estrutura Posicao a ser alterada.
+ * @param pos Pointer to the Position structure to be modified.
  */
-void mover_para_esquerda(Posicao* pos);
+void moveLeft(Position* pos);
 
 /**
- * @brief Move o objeto para a direita, aumentando o valor de x.
+ * @brief Moves the object to the right, increasing the x value.
  * 
- * @param pos Ponteiro para a estrutura Posicao a ser alterada.
+ * @param pos Pointer to the Position structure to be modified.
  */
-void mover_para_direita(Posicao* pos);
+void moveRight(Position* pos);
 
 #endif // !__PLAYER_H__

@@ -15,3 +15,23 @@ void updatePlayer(){
 void renderPlayer(){
 //TODO: Implementar o desenho do jogador
 }
+
+
+void moveUp(Position* pos) {
+    return;
+}
+
+
+void moveDown(Position* pos) {
+    return;
+}
+
+
+void moveLeft(Position* pos) {
+    return;
+}
+
+
+void moveRight(Position* pos) {
+    return;
+}
