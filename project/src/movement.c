@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
-#include "movimento.h"
+#include "movement.h"
 
 // Move a posição para cima (diminui y)
 void mover_para_cima(Posicao* pos) {
