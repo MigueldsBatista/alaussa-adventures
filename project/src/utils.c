@@ -9,5 +9,6 @@ void delay(unsigned int frame_limit){
 
 SDL_Texture* loadImage(const char* filename, SDL_Renderer* renderer){
 //TODO: Implementar a função loadImage
+return NULL;
 }
 

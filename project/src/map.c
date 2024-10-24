@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL2/SDL>
+#include <SDL2/SDL.h>
 #include "map.h"
 
 void loadMap(const char* map_file){
