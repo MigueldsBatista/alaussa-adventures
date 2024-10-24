@@ -9,7 +9,7 @@
  * any necessary configurations, resource allocations, and initial
  * game settings. It should be called before starting the game loop.
  */
-void initGame();
+void initGame(SDL_Renderer* renderer);
 
 /**
  * @brief Main loop of the game.
@@ -19,7 +19,7 @@ void initGame();
  * and rendering the game. It runs continuously until the game is
  * terminated.
  */
-void gameLoop();
+void gameLoop(SDL_Renderer* renderer);
 
 /**
  * @brief Shuts down the game and performs necessary cleanup operations.

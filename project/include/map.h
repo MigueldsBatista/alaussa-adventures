@@ -33,4 +33,18 @@ void loadMap(const char* map_file);
  */
 void renderMap();
 
+/**
+ * @brief Renders the background texture onto the screen.
+ *
+ * This function takes an SDL_Renderer, an SDL_Texture for the background, 
+ * and the current camera position to render the background texture appropriately.
+ *
+ * @param renderer The SDL_Renderer used to render the texture.
+ * @param background_texture The SDL_Texture representing the background image.
+ * @param camera_position The current position of the camera, used to determine 
+ *                        the portion of the background to render.
+ */
+void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camera_position, int screen_width, int screen_height);
+
+
 #endif // !__MAP_H__

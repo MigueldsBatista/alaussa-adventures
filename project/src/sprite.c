@@ -1,6 +1,7 @@
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL2/SDL.h>
 
 #include "sprite.h"
 
@@ -10,10 +11,20 @@ return;
 
 }
 
-SDL_Texture* loadTexture(const char* file, SDL_Renderer* renderer){
-//TODO: Implementar o carregamento da textura
-return NULL;
+SDL_Texture* loadTexture(const char* file, SDL_Renderer* renderer) {
+    SDL_Surface* surface = IMG_Load(file);
+    if (!surface) {
+        printf("Erro ao carregar a imagem: %s\n", IMG_GetError());
+        return NULL;
+    }
+    
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (!texture) {
+        printf("Erro ao criar textura: %s\n", SDL_GetError());
+    }
 
+    SDL_FreeSurface(surface);
+    return texture;
 }
 
 void updateSprite(Sprite* sprite){
