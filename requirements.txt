@@ -1,0 +1,2 @@
+#Não funciona usar pip pq isso é C e n python!
+sudo apt-get install libsdl2-dev
