@@ -11,14 +11,8 @@ Funções para o comportamento e animação dos inimigos.
  * @struct Enemy
  * @brief Represents an enemy entity in the game.
  * 
- * This structure holds the properties of an enemy, including its source and 
- * destination rectangles for rendering, as well as its position and velocity.
- * 
- * @param sourceRectangle
- * Source rectangle for rendering the enemy sprite.
- * 
- * @param destinationRectangle
- * Destination rectangle for rendering the enemy sprite.
+ * This structure holds the properties of an enemy, including its position,
+ * speed, health, activity status, and texture for rendering.
  * 
  * @param x
  * The x-coordinate of the enemy's position.
@@ -26,15 +20,27 @@ Funções para o comportamento e animação dos inimigos.
  * @param y
  * The y-coordinate of the enemy's position.
  * 
- * @param velocityX
- * The velocity of the enemy along the x-axis.
+ * @param speedX
+ * The speed of the enemy along the x-axis.
+ * 
+ * @param speedY
+ * The speed of the enemy along the y-axis.
+ * 
+ * @param health
+ * The health of the enemy.
+ * 
+ * @param isActive
+ * The activity status of the enemy.
+ * 
+ * @param texture
+ * The SDL texture used for rendering the enemy.
  */
 typedef struct {
-    int x, y;
-    int speedX, speedY;
-    int health;
-    bool isActive;
-    SDL_Texture *texture;
+     int x, y;
+     int speedX, speedY;
+     int health;
+     bool isActive;
+     SDL_Texture *texture;
 } Enemy;
 
 
