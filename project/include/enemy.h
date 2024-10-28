@@ -1,6 +1,7 @@
 #ifndef __ENEMY_H__
 #define __ENEMY_H__
 
+#include <stdbool.h>
 #include <SDL2/SDL.h>
 /*
 Funções para o comportamento e animação dos inimigos.
@@ -29,9 +30,13 @@ Funções para o comportamento e animação dos inimigos.
  * The velocity of the enemy along the x-axis.
  */
 typedef struct {
-     SDL_Rect sourceRectangle, destinationRectangle; 
-     int x, y, velocityX;
+    int x, y;
+    int speedX, speedY;
+    int health;
+    bool isActive;
+    SDL_Texture *texture;
 } Enemy;
+
 
 /**
  * @brief Initializes the enemy entity.
