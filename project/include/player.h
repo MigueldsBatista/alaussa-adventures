@@ -2,45 +2,54 @@
 #define __PLAYER_H__
 
 #include <SDL2/SDL.h>
+#include <stdbool.h>
+#include <stdio.h>
 
 /**
- * @brief Structure that represents the position of an object or character in the game.
+ * @brief Structure that represents the position of the player in the game.
  * 
- * The Position structure stores the x and y coordinates, where:
- * - x: Horizontal coordinate.
- * - y: Vertical coordinate.
+ * The Position structure stores the x and y coordinates, as well as the velocity.
  */
 typedef struct {
-    int x; ///< Horizontal coordinate (x position).
-    int y; ///< Vertical coordinate (y position).
+    double x, y;       // Posição do jogador
+    double velX, velY; // Velocidades em x e y
+    bool onGround;
+    bool Agachado;     // Flag que indica se o jogador está no chão
 } Position;
+
+/**
+ * @brief Structure that represents the player.
+ * 
+ * This structure includes the player's position and any other relevant attributes.
+ */
+typedef struct {
+    Position position; // Posição do jogador
+    int width;        // Largura do sprite do jogador
+    int height;      // Altura do sprite do jogador
+} Player;
 
 /**
  * @brief Initializes the player.
  * 
  * This function sets up the initial state of the player, including
- * any necessary variables, resources, or configurations required
- * for the player to function correctly in the game.
+ * necessary variables and configurations required for the player to function correctly.
  */
-void initPlayer();
+void initPlayer(Player *player);
 
 /**
  * @brief Updates the player's state.
  *
- * This function is responsible for updating the player's state, including
- * position, health, and other relevant attributes. It should be called
- * regularly to ensure the player's state is kept up-to-date.
+ * This function updates the player's position and handles gravity.
  */
-void updatePlayer();
+void updatePlayer(Player *player, double gravity, double deltaTime);
 
 /**
  * @brief Renders the player on the screen.
  *
  * This function is responsible for drawing the player character
- * on the screen. It handles all the necessary graphical operations
- * to ensure the player is displayed correctly.
+ * on the screen.
  */
-void renderPlayer();
+void renderPlayer(Player *player);
 
 /**
  * @brief Handles the player's input events.
@@ -49,35 +58,39 @@ void renderPlayer();
  * state accordingly based on the input received.
  * 
  * @param event Pointer to an SDL_Event structure that contains the event data.
+ * @param player Pointer to the Player structure to update.
  */
-void handlePlayerInput(SDL_Event *event);
+void handlePlayerInput(SDL_Event *event, Player *player);
 
 /**
- * @brief Moves the object up, decreasing the y value.
+ * @brief Makes the player jump.
  * 
- * @param pos Pointer to the Position structure to be modified.
+ * This function applies an upward velocity to the player, causing them to jump.
+ * 
+ * @param player Pointer to the Player structure.
  */
-void moveUp(Position* pos);
+void jumpPlayer(Player *player);
 
 /**
- * @brief Moves the object down, increasing the y value.
+ * @brief Moves the player left.
  * 
- * @param pos Pointer to the Position structure to be modified.
+ * This function modifies the player's position to move left.
+ * 
+ * @param player Pointer to the Player structure.
  */
-void moveDown(Position* pos);
+void moveLeft(Player *player);
 
 /**
- * @brief Moves the object to the left, decreasing the x value.
+ * @brief Moves the player right.
  * 
- * @param pos Pointer to the Position structure to be modified.
+ * This function modifies the player's position to move right.
+ * 
+ * @param player Pointer to the Player structure.
  */
-void moveLeft(Position* pos);
+void moveRight(Player *player);
 
-/**
- * @brief Moves the object to the right, increasing the x value.
- * 
- * @param pos Pointer to the Position structure to be modified.
- */
-void moveRight(Position* pos);
+void AgacharPlayer(Position *pos);
+
+void LevantarPlayer(Position *pos);
 
 #endif // !__PLAYER_H__
