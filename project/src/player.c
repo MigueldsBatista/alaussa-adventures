@@ -1,93 +1,125 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <SDL2/SDL.h>
-
 #include "player.h"
+#include <SDL2/SDL_image.h>
 
-
-void initPlayer(Player *player) {
-    player->position.x = 100; // Posição inicial
-    player->position.y = 500; // Altura inicial (exemplo)
-    player->position.velX = 0;
-    player->position.velY = 0;
-    player->position.onGround = true; // Começa no chão
-    player->width = 32;  // Exemplo: largura do sprite do Mario
-    player->height = 32; // Exemplo: altura do sprite do Mario
+void initPlayer(Player *player, SDL_Renderer *renderer) {
+    player->position.x = 100.0;
+    player->position.y = 100.0;
+    player->position.velX = 0.0;
+    player->position.velY = 0.0;
+    player->position.onGround = true;
+    player->width = 64;
+    player->height = 64;
+    player->currentFrame = 0;
+    loadAnimationFrames(player, PLAYER_IDLE, renderer);
 }
 
 void updatePlayer(Player *player, double gravity, double deltaTime) {
     if (!player->position.onGround) {
-        player->position.velY += gravity * deltaTime; // Aplicar gravidade
-        player->position.y += player->position.velY * deltaTime;
+        player->position.velY += gravity * deltaTime;
+    }
+    player->position.x += player->position.velX * deltaTime;
+    player->position.y += player->position.velY * deltaTime;
 
-        // Verifica se colidiu com o chão (exemplo: y=500 é o nível do chão)
-        if (player->position.y >= 500) {
-            player->position.y = 500; // Ajusta para não passar do chão
-            player->position.velY = 0;
-            player->position.onGround = true; // Está no chão
-        }
+    if (player->position.velX != 0) {
+        player->currentFrame = (player->currentFrame + 1) % player->totalFrames;
+    } else {
+        player->currentFrame = 0; // Reset to idle frame
     }
 }
 
-void renderPlayer(Player *player) {
-    // Aqui você deve implementar a renderização do sprite do jogador usando SDL
-    // Exemplo:
-    // SDL_Rect rect = { (int)player->position.x, (int)player->position.y, player->width, player->height };
-    // SDL_RenderCopy(renderer, playerTexture, NULL, &rect);
+void renderPlayer(Player *player, SDL_Renderer *renderer) {
+    SDL_Rect dstRect;
+    dstRect.x = (int)player->position.x;
+    dstRect.y = (int)player->position.y;
+    dstRect.w = player->width;
+    dstRect.h = player->height;
+
+    SDL_RenderCopy(renderer, player->animationFrames[player->currentFrame], NULL, &dstRect);
 }
 
-void AgacharPlayer(Position *pos) {
-    pos->Agachado = true;
-    pos->y += 10; // Mova a posição para baixo (ou ajuste a altura conforme necessário)
-}
-
-void LevantarPlayer(Position *pos) {
-    pos->Agachado = false;
-    pos->y -= 10; // Volte para a posição original
-}
-
-void handlePlayerInput(SDL_Event *event, Player *player) {
+PlayerAction handlePlayerInput(SDL_Event *event, Player *player) {
     if (event->type == SDL_KEYDOWN) {
         switch (event->key.keysym.sym) {
-            case SDLK_a: 
+            case SDLK_a:
                 moveLeft(player);
-                break;
-            case SDLK_d: 
+                return PLAYER_MOVE_LEFT;
+            case SDLK_d:
                 moveRight(player);
-                break;
-            case SDLK_w: // Faz pular
+                return PLAYER_MOVE_RIGHT;
+            case SDLK_w :
                 jumpPlayer(player);
-                break;
-            case SDLK_s: 
-                // Implementar lógica de agachar se necessário
-                break;
-            case SDLK_LEFT: // Flecha esquerda
+                return PLAYER_JUMP;
+            case SDLK_LEFT:
                 moveLeft(player);
-                break;
-            case SDLK_RIGHT: // Flecha direita
+                return PLAYER_MOVE_LEFT;
+            case SDLK_RIGHT:
                 moveRight(player);
-                break;
-            case SDLK_SPACE: // Pulo
+                return PLAYER_MOVE_RIGHT;
+            case SDLK_SPACE:
                 jumpPlayer(player);
-                break;
+                return PLAYER_JUMP;
+        }
+    }
+    return PLAYER_IDLE; // Se nenhuma tecla for pressionada
+}
+
+void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *renderer) {
+    int frameCount = 0;
+
+    switch (action) {
+        case PLAYER_IDLE:
+            frameCount = 1;
+            break;
+        case PLAYER_MOVE_LEFT:
+        case PLAYER_MOVE_RIGHT:
+            frameCount = 3;
+            break;
+        case PLAYER_JUMP:
+        case PLAYER_FALL:
+            frameCount = 2;
+            break;
+        default:
+            break;
+    }
+
+    player->animationFrames = malloc(sizeof(SDL_Texture*) * frameCount);
+    player->totalFrames = frameCount;
+
+    for (int i = 0; i < frameCount; i++) {
+        char filename[50];
+
+        if (action == PLAYER_MOVE_LEFT) {
+            sprintf(filename, "project/assets/images/player_left_%d.png", i + 1);
+        } else if (action == PLAYER_MOVE_RIGHT) {
+            sprintf(filename, "project/assets/images/player_right_%d.png", i + 1);
+        } else if (action == PLAYER_IDLE) {
+            sprintf(filename, "project/assets/images/player_idle_%d.png", i + 1);
+        } else if (action == PLAYER_JUMP) {
+            sprintf(filename, "project/assets/images/player_jump_%d.png", i + 1);
+        }
+
+        SDL_Surface *surface = IMG_Load(filename);
+        if (surface == NULL) {
+            printf("Falha ao carregar a imagem: %s\n", IMG_GetError());
+        } else {
+            player->animationFrames[i] = SDL_CreateTextureFromSurface(renderer, surface);
+            SDL_FreeSurface(surface);
         }
     }
 }
 
-
 void jumpPlayer(Player *player) {
-    if (player->position.onGround) {
-        player->position.velY = -400; // Impulso para o pulo
-        player->position.onGround = false; // Não está mais no chão
+    if(player->position.onGround){
+    player->position.velY = -300.0;
+    player->position.onGround = false;        
     }
+
 }
 
 void moveLeft(Player *player) {
-    player->position.velX = -200; // Velocidade de movimento para a esquerda
-    player->position.x += player->position.velX; // Atualiza a posição
+    player->position.velX = -200.0;
 }
 
 void moveRight(Player *player) {
-    player->position.velX = 200; // Velocidade de movimento para a direita
-    player->position.x += player->position.velX; // Atualiza a posição
+    player->position.velX = 200.0;
 }

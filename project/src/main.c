@@ -2,63 +2,78 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "game.h"
-#include "map.h"
+
 #include "player.h"
-#include "enemy.h"
-#include "sprite.h"
-#include "utils.h"
+#include "map.h"
 
 int main(int argc, char* argv[]) {
-    // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("Error initializing SDL: %s\n", SDL_GetError());
+        printf("Erro ao inicializar SDL: %s\n", SDL_GetError());
         return 1;
     }
 
-    // Initialize SDL_image
     if (IMG_Init(IMG_INIT_PNG) == 0) {
-        printf("Error initializing SDL_image: %s\n", IMG_GetError());
+        printf("Erro ao inicializar SDL_image: %s\n", IMG_GetError());
         SDL_Quit();
         return 1;
     }
 
-    // Create a window and renderer
-    SDL_Window* window = SDL_CreateWindow("Background Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
+    SDL_Window* window = SDL_CreateWindow("Exemplo de Animação do Jogador", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    // Load the background texture
-    SDL_Texture* background = loadTexture("project/assets/images/parallax.png", renderer);
+    Player player;
+    initPlayer(&player, renderer);
 
-    // Game loop
     int running = 1;
-    int camera_position = 0;
+    double gravity = 500.0;
+    double deltaTime = 0.016; // Aproximadamente 60 FPS
     while (running) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 running = 0;
             }
+            PlayerAction action = handlePlayerInput(&event, &player);
+            printf("Ação do jogador: %d\n", action);
         }
 
-        // Clear the screen
+        updatePlayer(&player, gravity, deltaTime);
+
+        // Implementar lógica para o chão
+        if (player.position.y + player.height >= GROUND_LEVEL) {
+            player.position.y = GROUND_LEVEL - player.height; // Colocar o jogador na altura do chão
+            player.position.velY = 0; // Resetar velocidade vertical
+            player.position.onGround = true; // Indicar que o jogador está no chão
+        } else {
+            player.position.onGround = false; // O jogador não está no chão
+        }
+
+        // Lógica para limitar o movimento do jogador nas bordas da tela
+        if (player.position.x < 0) {
+            player.position.x = 0; // Impedir que o jogador saia pela esquerda
+        } else if (player.position.x + player.width > SCREEN_WIDTH) {
+            player.position.x = SCREEN_WIDTH - player.width; // Impedir que o jogador saia pela direita
+        }
+
         SDL_RenderClear(renderer);
+        
+        // Desenhar o chão
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Cor verde para o chão
+        SDL_Rect groundRect = {0, GROUND_LEVEL, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_LEVEL};
+        SDL_RenderFillRect(renderer, &groundRect);
 
-        // Render the background with parallax effect
-        renderBackground(renderer, background, camera_position, 640, 480);
-
-        // Present the screen
+        renderPlayer(&player, renderer);
         SDL_RenderPresent(renderer);
 
-        // Simulate camera movement
-        camera_position += 1;
-
-        // Limit the frame rate
         SDL_Delay(16);
     }
 
-    // Clean up resources
-    SDL_DestroyTexture(background);
+    // Limpeza de recursos
+    for (int i = 0; i < player.totalFrames; i++) {
+        SDL_DestroyTexture(player.animationFrames[i]);
+    }
+    free(player.animationFrames);
+    
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     IMG_Quit();

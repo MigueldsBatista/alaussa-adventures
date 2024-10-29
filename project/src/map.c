@@ -3,8 +3,7 @@
 #include <SDL2/SDL.h>
 #include "map.h"
 
-#define MAX_MAP_WIDTH 100
-#define MAX_MAP_HEIGHT 100
+
 
 // Estrutura de dados para o mapa
 typedef struct {

@@ -2,7 +2,12 @@
 #define __MAP_H__
 
 #include <SDL2/SDL.h>
+#define MAX_MAP_WIDTH 100
+#define MAX_MAP_HEIGHT 100
 
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+#define GROUND_LEVEL (SCREEN_HEIGHT - 50) // Altura do chão a 50 pixels do fundo
 /**
  * @brief Represents a block in the game map.
  * 
