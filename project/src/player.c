@@ -41,27 +41,34 @@ PlayerAction handlePlayerInput(SDL_Event *event, Player *player) {
     if (event->type == SDL_KEYDOWN) {
         switch (event->key.keysym.sym) {
             case SDLK_a:
-                moveLeft(player);
-                return PLAYER_MOVE_LEFT;
-            case SDLK_d:
-                moveRight(player);
-                return PLAYER_MOVE_RIGHT;
-            case SDLK_w :
-                jumpPlayer(player);
-                return PLAYER_JUMP;
             case SDLK_LEFT:
                 moveLeft(player);
                 return PLAYER_MOVE_LEFT;
+
+            case SDLK_d:
             case SDLK_RIGHT:
                 moveRight(player);
                 return PLAYER_MOVE_RIGHT;
+
+            case SDLK_w:
             case SDLK_SPACE:
                 jumpPlayer(player);
                 return PLAYER_JUMP;
         }
+    } else if (event->type == SDL_KEYUP) {
+        switch (event->key.keysym.sym) {
+            case SDLK_a:
+            case SDLK_LEFT:
+            case SDLK_d:
+            case SDLK_RIGHT:
+            
+                player->position.velX = 0.0;
+                return PLAYER_IDLE;
+        }
     }
-    return PLAYER_IDLE; // Se nenhuma tecla for pressionada
+    return PLAYER_IDLE;
 }
+
 
 void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *renderer) {
     int frameCount = 0;
@@ -89,13 +96,13 @@ void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *rend
         char filename[50];
 
         if (action == PLAYER_MOVE_LEFT) {
-            sprintf(filename, "project/assets/images/player_left_%d.png", i + 1);
+            sprintf(filename, "project/assets/images/player_left_%d.png", i);
         } else if (action == PLAYER_MOVE_RIGHT) {
-            sprintf(filename, "project/assets/images/player_right_%d.png", i + 1);
+            sprintf(filename, "project/assets/images/player_right_%d.png", i );
         } else if (action == PLAYER_IDLE) {
-            sprintf(filename, "project/assets/images/player_idle_%d.png", i + 1);
+            sprintf(filename, "project/assets/images/player_idle_%d.png", i );
         } else if (action == PLAYER_JUMP) {
-            sprintf(filename, "project/assets/images/player_jump_%d.png", i + 1);
+            sprintf(filename, "project/assets/images/player_jump_%d.png", i );
         }
 
         SDL_Surface *surface = IMG_Load(filename);

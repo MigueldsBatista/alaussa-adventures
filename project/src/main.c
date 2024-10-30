@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 
     int running = 1;
     double gravity = 500.0;
-    double deltaTime = 0.016; // Aproximadamente 60 FPS
+    double deltaTime = 0.09; // Aproximadamente 60 FPS
     while (running) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
