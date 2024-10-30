@@ -5,6 +5,7 @@
 
 #include "player.h"
 #include "map.h"
+#include "enemy.h"
 
 int main(int argc, char* argv[]) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
