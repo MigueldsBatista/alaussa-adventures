@@ -61,7 +61,7 @@ void initPlayer(Player *player, SDL_Renderer *renderer);
  * @param gravity The force of gravity to apply.
  * @param deltaTime Time since the last update (in seconds).
  */
-void updatePlayer(Player *player, double gravity, double deltaTime);
+void updatePlayer(Player *player, double gravity, double deltaTime, SDL_Renderer *renderer);
 
 /**
  * @brief Renders the player on the screen.

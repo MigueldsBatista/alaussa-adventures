@@ -13,17 +13,26 @@ void initPlayer(Player *player, SDL_Renderer *renderer) {
     loadAnimationFrames(player, PLAYER_IDLE, renderer);
 }
 
-void updatePlayer(Player *player, double gravity, double deltaTime) {
+void updatePlayer(Player *player, double gravity, double deltaTime, SDL_Renderer *renderer) {
+    // Aplicar gravidade se o jogador não estiver no chão
     if (!player->position.onGround) {
         player->position.velY += gravity * deltaTime;
     }
+
+    // Atualizar a posição do jogador
     player->position.x += player->position.velX * deltaTime;
     player->position.y += player->position.velY * deltaTime;
 
-    if (player->position.velX != 0) {
+    // Atualizar a animação com base na posição e no estado
+    if (player->position.velX > 0) { // Movendo para a direita
         player->currentFrame = (player->currentFrame + 1) % player->totalFrames;
-    } else {
-        player->currentFrame = 0; // Reset to idle frame
+        loadAnimationFrames(player, PLAYER_MOVE_RIGHT, renderer); // Carregar frames de movimento para a direita
+    } else if (player->position.velX < 0) { // Movendo para a esquerda
+        player->currentFrame = (player->currentFrame + 1) % player->totalFrames;
+        loadAnimationFrames(player, PLAYER_MOVE_LEFT, renderer); // Carregar frames de movimento para a esquerda
+    } else { // Jogador está parado
+        player->currentFrame = 0; // Reset para o frame de idle
+        loadAnimationFrames(player, PLAYER_IDLE, renderer); // Carregar frames de idle
     }
 }
 

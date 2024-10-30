@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
             printf("Ação do jogador: %d\n", action);
         }
 
-        updatePlayer(&player, gravity, deltaTime);
+        updatePlayer(&player, gravity, deltaTime, renderer);
 
         // Implementar lógica para o chão
         if (player.position.y + player.height >= GROUND_LEVEL) {
