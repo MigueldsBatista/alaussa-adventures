@@ -61,6 +61,7 @@ PlayerAction handlePlayerInput(SDL_Event *event, Player *player) {
 
             case SDLK_w:
             case SDLK_SPACE:
+            case SDLK_UP:
                 jumpPlayer(player);
                 return PLAYER_JUMP;
         }
