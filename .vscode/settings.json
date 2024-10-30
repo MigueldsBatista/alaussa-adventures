@@ -60,6 +60,7 @@
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
     "player.h": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "sdl_image.h": "c"
   }
 }
