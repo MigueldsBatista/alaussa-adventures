@@ -24,17 +24,25 @@ void updatePlayer(Player *player, double gravity, double deltaTime, SDL_Renderer
     player->position.y += player->position.velY * deltaTime;
 
     // Atualizar a animação com base na posição e no estado
-    if (player->position.velX > 0) { // Movendo para a direita
+    if (player->position.velX > 0 && player->position.onGround) { // Movendo para a direita no chão
         player->currentFrame = (player->currentFrame + 1) % player->totalFrames;
-        loadAnimationFrames(player, PLAYER_MOVE_RIGHT, renderer); // Carregar frames de movimento para a direita
-    } else if (player->position.velX < 0) { // Movendo para a esquerda
+        loadAnimationFrames(player, PLAYER_MOVE_RIGHT, renderer);
+    } else if (player->position.velX < 0 && player->position.onGround) { // Movendo para a esquerda no chão
         player->currentFrame = (player->currentFrame + 1) % player->totalFrames;
-        loadAnimationFrames(player, PLAYER_MOVE_LEFT, renderer); // Carregar frames de movimento para a esquerda
-    } else { // Jogador está parado
+        loadAnimationFrames(player, PLAYER_MOVE_LEFT, renderer);
+    } else if (!player->position.onGround) { // Jogador está no ar (pulando ou caindo)
+        player->currentFrame = (player->currentFrame + 1) % player->totalFrames;
+        if (player->position.velX >= 0) {
+            loadAnimationFrames(player, PLAYER_JUMP_RIGHT, renderer); // Pulo para a direita
+        } else {
+            loadAnimationFrames(player, PLAYER_JUMP_LEFT, renderer); // Pulo para a esquerda
+        }
+    } else { // Jogador está parado no chão
         player->currentFrame = 0; // Reset para o frame de idle
-        loadAnimationFrames(player, PLAYER_IDLE, renderer); // Carregar frames de idle
+        loadAnimationFrames(player, PLAYER_IDLE, renderer);
     }
 }
+
 
 void renderPlayer(Player *player, SDL_Renderer *renderer) {
     SDL_Rect dstRect;
@@ -63,7 +71,11 @@ PlayerAction handlePlayerInput(SDL_Event *event, Player *player) {
             case SDLK_SPACE:
             case SDLK_UP:
                 jumpPlayer(player);
-                return PLAYER_JUMP;
+                if(player->position.velX >= 0){
+                    return PLAYER_JUMP_RIGHT;
+                } else {
+                    return PLAYER_JUMP_LEFT;
+                }
         }
     } else if (event->type == SDL_KEYUP) {
         switch (event->key.keysym.sym) {
@@ -71,13 +83,13 @@ PlayerAction handlePlayerInput(SDL_Event *event, Player *player) {
             case SDLK_LEFT:
             case SDLK_d:
             case SDLK_RIGHT:
-            
                 player->position.velX = 0.0;
                 return PLAYER_IDLE;
         }
     }
     return PLAYER_IDLE;
 }
+
 
 
 void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *renderer) {
@@ -91,8 +103,10 @@ void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *rend
         case PLAYER_MOVE_RIGHT:
             frameCount = 3;
             break;
-        case PLAYER_JUMP:
-        case PLAYER_FALL:
+        case PLAYER_JUMP_RIGHT:
+        case PLAYER_JUMP_LEFT:
+        case PLAYER_FALL_LEFT:
+        case PLAYER_FALL_RIGHT:
             frameCount = 2;
             break;
         default:
@@ -111,8 +125,10 @@ void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *rend
             sprintf(filename, "project/assets/images/player_right_%d.png", i );
         } else if (action == PLAYER_IDLE) {
             sprintf(filename, "project/assets/images/player_idle_%d.png", i );
-        } else if (action == PLAYER_JUMP) {
-            sprintf(filename, "project/assets/images/player_jump_%d.png", i );
+        } else if (action == PLAYER_JUMP_LEFT) {
+            sprintf(filename, "project/assets/images/player_jump_left_%d.png", i );
+        } else if (action == PLAYER_JUMP_RIGHT) {
+            sprintf(filename, "project/assets/images/player_jump_right_%d.png", i );
         }
 
         SDL_Surface *surface = IMG_Load(filename);
@@ -128,7 +144,8 @@ void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *rend
 void jumpPlayer(Player *player) {
     if(player->position.onGround){
     player->position.velY = -300.0;
-    player->position.onGround = false;        
+    player->position.onGround = false;      
+  
     }
 
 }

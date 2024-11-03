@@ -21,8 +21,10 @@ typedef enum {
     PLAYER_IDLE,// Estado de repouso
     PLAYER_MOVE_LEFT,
     PLAYER_MOVE_RIGHT,
-    PLAYER_JUMP,
-    PLAYER_FALL,
+    PLAYER_JUMP_LEFT,
+    PLAYER_JUMP_RIGHT,
+    PLAYER_FALL_LEFT,
+    PLAYER_FALL_RIGHT,
 } PlayerAction;
 
 /**
