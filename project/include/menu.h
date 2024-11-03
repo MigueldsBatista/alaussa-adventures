@@ -13,6 +13,8 @@ typedef struct {
 
 bool pontoDentroDoRetangulo(int x, int y, SDL_Rect *rect);
 
-void renderizarBotao(SDL_Renderer *renderer, Botao *botao);
+void renderizarBotao(SDL_Renderer *renderer, Botao *botao, TTF_Font *font, const char *text);
+
+void mostrarInstrucoes(SDL_Renderer *renderer, TTF_Font *font);
 
 #endif

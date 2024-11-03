@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "player.h"
 #include "map.h"
@@ -20,12 +21,32 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    if (TTF_Init() == -1) {
+        printf("Erro ao inicializar SDL_ttf: %s\n", TTF_GetError());
+        IMG_Quit();
+        SDL_Quit();
+        return 1;
+    }
+
     SDL_Window* window = SDL_CreateWindow("Jogo com Menu Inicial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    // Criação dos botões do menu
-    Botao botaoJogar = {{300, 200, 200, 50}, {0, 128, 255, 255}};  // Botão azul para "Jogar"
-    Botao botaoSair = {{300, 300, 200, 50}, {255, 0, 0, 255}};     // Botão vermelho para "Sair"
+    // carregar a fonte
+    TTF_Font* font = TTF_OpenFont("./project/assets/fontes/Open-Sans.ttf", 24);//primeiro é o caminho da fonte que eu adicionei e depois vem o tamanho da fonte
+    if (!font) {
+        printf("Erro ao carregar fonte: %s\n", TTF_GetError());
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        IMG_Quit();
+        SDL_Quit();
+        return 1;
+    }
+
+    Botao botaoJogar = {{230, 100, 200, 50}, {0, 255, 0, 255}};      
+    Botao botaoInstrucoes = {{230, 200, 200, 50}, {255, 255, 0, 255}}; 
+    Botao botaoSair = {{230, 300, 200, 50}, {255, 0, 0, 255}};
+
 
     bool noMenu = true;
     bool running = true;
@@ -42,7 +63,9 @@ int main(int argc, char* argv[]) {
                 SDL_GetMouseState(&x, &y);
                 if (pontoDentroDoRetangulo(x, y, &botaoJogar.rect)) {
                     noMenu = false;  // Iniciar o jogo
-                } else if (pontoDentroDoRetangulo(x, y, &botaoSair.rect)) {
+                }else if(pontoDentroDoRetangulo(x,y, &botaoInstrucoes.rect)){
+                    mostrarInstrucoes(renderer, font);
+                }else if (pontoDentroDoRetangulo(x, y, &botaoSair.rect)) {
                     noMenu = false;
                     running = false; // Sair do jogo
                 }
@@ -53,8 +76,9 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Fundo preto
         SDL_RenderClear(renderer);
 
-        renderizarBotao(renderer, &botaoJogar);
-        renderizarBotao(renderer, &botaoSair);
+        renderizarBotao(renderer, &botaoJogar, font, "Jogar");
+        renderizarBotao(renderer, &botaoInstrucoes, font, "Como Joga?");
+        renderizarBotao(renderer, &botaoSair, font, "Sair");
         SDL_RenderPresent(renderer);
     }
 
@@ -111,8 +135,11 @@ int main(int argc, char* argv[]) {
         free(player.animationFrames);
     }
 
+    // Limpeza final
+    TTF_CloseFont(font); // Fechar a fonte
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    TTF_Quit(); // Encerrar SDL_ttf
     IMG_Quit();
     SDL_Quit();
 
