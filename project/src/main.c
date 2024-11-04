@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
         Player player;
         initPlayer(&player, renderer);
 
-        double gravity = 500.0;
+        double gravity = 250.0;
         double deltaTime = 0.09; // Aproximadamente 60 FPS
         while (running) {
             SDL_Event event;

@@ -143,7 +143,7 @@ void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *rend
 
 void jumpPlayer(Player *player) {
     if(player->position.onGround){
-    player->position.velY = -300.0;
+    player->position.velY = -225.0;
     player->position.onGround = false;      
   
     }
