@@ -15,7 +15,7 @@ void renderizarBotao(SDL_Renderer *renderer, Botao *botao, TTF_Font *font, const
     SDL_RenderFillRect(renderer, &botao->rect);
 
     // Cria o texto dentro do botão
-    SDL_Surface *surface = TTF_RenderText_Solid(font, text, (SDL_Color){255, 255, 255});
+    SDL_Surface *surface = TTF_RenderText_Solid(font, text, (SDL_Color){0, 0, 0});
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     int text_width = surface->w;
     int text_height = surface->h;
@@ -48,7 +48,7 @@ void renderizarTexto(SDL_Renderer *renderer, TTF_Font *font, const char *texto, 
 }
 
 void mostrarInstrucoes(SDL_Renderer *renderer, TTF_Font *font) {
-    SDL_Color corTexto = {255, 255, 255, 255};
+    SDL_Color corTexto = {0, 0, 0, 0};
     SDL_RenderClear(renderer);
 
     renderizarTexto(renderer, font, "Instrucoes:", corTexto, 250, 50);

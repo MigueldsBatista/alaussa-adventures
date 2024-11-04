@@ -4,6 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "sound.h"
 #include "player.h"
 #include "map.h"
 #include "enemy.h"
@@ -27,6 +28,10 @@ int main(int argc, char* argv[]) {
         SDL_Quit();
         return 1;
     }
+    
+    if (!initAudio()) {
+        return 1;
+    }
 
     SDL_Window* window = SDL_CreateWindow("Jogo com Menu Inicial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -43,13 +48,22 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    Botao botaoJogar = {{230, 100, 200, 50}, {0, 255, 0, 255}};      
+    //commitei antes porém esqueci de dizer oq cada um faz
+    // Botao 'nome do botão' = {{'quao vai ficar afastado da borda esquerda','altura', 'tamanho x', 'tamanho y'}, {cor em RGB}}
+    Botao botaoJogar = {{230, 100, 200, 50}, {0, 255, 0, 255}}; 
     Botao botaoInstrucoes = {{230, 200, 200, 50}, {255, 255, 0, 255}}; 
     Botao botaoSair = {{230, 300, 200, 50}, {255, 0, 0, 255}};
 
 
     bool noMenu = true;
     bool running = true;
+
+    //aqui é onde toda  amagia começa do audio se der erro nesse caminho vai dar erro em tudo
+    //passei muito tmepo quebrando a cabeça se a musica n tocar vejam se eu botei o caminho certo :)
+    Mix_Music* bgMusic = loadMusic("./project/assets/musica/musicaAED.mp3");
+    if (bgMusic) {
+        playMusic(bgMusic);
+    }
 
     // Loop do menu inicial
     while (noMenu) {
@@ -77,7 +91,7 @@ int main(int argc, char* argv[]) {
         SDL_RenderClear(renderer);
 
         renderizarBotao(renderer, &botaoJogar, font, "Jogar");
-        renderizarBotao(renderer, &botaoInstrucoes, font, "Como Joga?");
+        renderizarBotao(renderer, &botaoInstrucoes, font, "Comandos");
         renderizarBotao(renderer, &botaoSair, font, "Sair");
         SDL_RenderPresent(renderer);
     }
@@ -136,6 +150,8 @@ int main(int argc, char* argv[]) {
     }
 
     // Limpeza final
+    freeMusic(bgMusic);
+    closeAudio();
     TTF_CloseFont(font); // Fechar a fonte
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

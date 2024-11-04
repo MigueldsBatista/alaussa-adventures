@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Iproject/include
-LIBS = -lSDL2 -lSDL2_image -lSDL2_ttf
+LIBS = -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 
 
 SRCS = project/src/main.c \
@@ -10,7 +10,8 @@ project/src/sprite.c \
 project/src/map.c \
 project/src/enemy.c \
 project/src/utils.c \
-project/src/menu.c
+project/src/menu.c \
+project/src/sound.c
 
 OBJS = $(SRCS:.c=.o)
 
