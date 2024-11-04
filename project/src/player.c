@@ -151,9 +151,9 @@ void jumpPlayer(Player *player) {
 }
 
 void moveLeft(Player *player) {
-    player->position.velX = -200.0;
+    player->position.velX = -100.0;
 }
 
 void moveRight(Player *player) {
-    player->position.velX = 200.0;
+    player->position.velX = 100.0;
 }
