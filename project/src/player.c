@@ -120,15 +120,15 @@ void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *rend
         char filename[50];
 
         if (action == PLAYER_MOVE_LEFT) {
-            sprintf(filename, "project/assets/images/player_left_%d.png", i);
+            sprintf(filename, "project/assets/MovPlayer/player_left_%d.png", i);
         } else if (action == PLAYER_MOVE_RIGHT) {
-            sprintf(filename, "project/assets/images/player_right_%d.png", i );
+            sprintf(filename, "project/assets/MovPlayer/player_right_%d.png", i );
         } else if (action == PLAYER_IDLE) {
-            sprintf(filename, "project/assets/images/player_idle_%d.png", i );
+            sprintf(filename, "project/assets/MovPlayer/player_idle_%d.png", i );
         } else if (action == PLAYER_JUMP_LEFT) {
-            sprintf(filename, "project/assets/images/player_jump_left_%d.png", i );
+            sprintf(filename, "project/assets/MovPlayer/player_jump_left_%d.png", i );
         } else if (action == PLAYER_JUMP_RIGHT) {
-            sprintf(filename, "project/assets/images/player_jump_right_%d.png", i );
+            sprintf(filename, "project/assets/MovPlayer/player_jump_right_%d.png", i );
         }
 
         SDL_Surface *surface = IMG_Load(filename);
