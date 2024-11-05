@@ -23,6 +23,16 @@ void updatePlayer(Player *player, double gravity, double deltaTime, SDL_Renderer
     player->position.x += player->position.velX * deltaTime;
     player->position.y += player->position.velY * deltaTime;
 
+    // Check for collisions with blocks
+    if (checkPlayerBlockCollision(player)) {
+        // Handle collision (e.g., stop movement, adjust position)
+        player->position.x -= player->position.velX * deltaTime;
+        player->position.y -= player->position.velY * deltaTime;
+        player->position.velX = 0;
+        player->position.velY = 0;
+        player->position.onGround = true;
+    }
+
     // Atualizar a animação com base na posição e no estado
     if (player->position.velX > 0 && player->position.onGround) { // Movendo para a direita no chão
         player->currentFrame = (player->currentFrame + 1) % player->totalFrames;

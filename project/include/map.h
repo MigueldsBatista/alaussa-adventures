@@ -36,7 +36,7 @@ void loadMap(const char* map_file);
  * all the necessary operations to display the current state of the map
  * to the player.
  */
-void renderMap();
+void renderMap(SDL_Renderer* renderer, SDL_Texture* bloco_texture);
 
 /**
  * @brief Renders the background texture onto the screen.

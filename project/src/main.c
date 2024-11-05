@@ -9,6 +9,7 @@
 #include "map.h"
 #include "enemy.h"
 #include "menu.h"
+#include "sprite.h"
 
 int main(int argc, char* argv[]) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -35,6 +36,7 @@ int main(int argc, char* argv[]) {
 
     SDL_Window* window = SDL_CreateWindow("Jogo com Menu Inicial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Texture* bloco_texture = loadTexture("project/assets/blocks/block.png", renderer); // Load block texture
 
     // carregar a fonte
     TTF_Font* font = TTF_OpenFont("./project/assets/fontes/Open-Sans.ttf", 24);//primeiro é o caminho da fonte que eu adicionei e depois vem o tamanho da fonte
@@ -90,6 +92,8 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Fundo preto
         SDL_RenderClear(renderer);
 
+        loadMap("./project/assets/map/map.txt");
+
         renderizarBotao(renderer, &botaoJogar, font, "Jogar");
         renderizarBotao(renderer, &botaoInstrucoes, font, "Comandos");
         renderizarBotao(renderer, &botaoSair, font, "Sair");
@@ -136,6 +140,9 @@ int main(int argc, char* argv[]) {
             SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
             SDL_Rect groundRect = {0, GROUND_LEVEL, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_LEVEL};
             SDL_RenderFillRect(renderer, &groundRect);
+
+            renderMap(renderer, bloco_texture);
+
 
             renderPlayer(&player, renderer);
             SDL_RenderPresent(renderer);
