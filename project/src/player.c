@@ -1,13 +1,14 @@
 #include "player.h"
-#include <SDL2/SDL_image.h>
+#include "map.h"
+#include <SDL2/SDL_image.h> 
 
-void initPlayer(Player *player, SDL_Renderer *renderer) {
-    player->position.x = 100.0;
-    player->position.y = 100.0;
-    player->position.velX = 0.0;
-    player->position.velY = 0.0;
-    player->position.onGround = true;
-    player->width = 64;
+void initPlayer(Player *player, SDL_Renderer *renderer) { 
+    player->position.x = 100.0; 
+    player->position.y = 100.0; 
+    player->position.velX = 0.0; 
+    player->position.velY = 0.0; 
+    player->position.onGround = true; 
+    player->width = 64; 
     player->height = 64;
     player->currentFrame = 0;
     loadAnimationFrames(player, PLAYER_IDLE, renderer);
@@ -24,14 +25,17 @@ void updatePlayer(Player *player, double gravity, double deltaTime, SDL_Renderer
     player->position.y += player->position.velY * deltaTime;
 
     // Check for collisions with blocks
+    bool onGround = false;
     if (checkPlayerBlockCollision(player)) {
         // Handle collision (e.g., stop movement, adjust position)
         player->position.x -= player->position.velX * deltaTime;
         player->position.y -= player->position.velY * deltaTime;
         player->position.velX = 0;
         player->position.velY = 0;
-        player->position.onGround = true;
     }
+
+    // Atualiza se o jogador está no chão com base na colisão
+    player->position.onGround = onGround;
 
     // Atualizar a animação com base na posição e no estado
     if (player->position.velX > 0 && player->position.onGround) { // Movendo para a direita no chão
@@ -52,6 +56,7 @@ void updatePlayer(Player *player, double gravity, double deltaTime, SDL_Renderer
         loadAnimationFrames(player, PLAYER_IDLE, renderer);
     }
 }
+
 
 
 void renderPlayer(Player *player, SDL_Renderer *renderer) {
@@ -167,3 +172,7 @@ void moveLeft(Player *player) {
 void moveRight(Player *player) {
     player->position.velX = 100.0;
 }
+
+
+
+

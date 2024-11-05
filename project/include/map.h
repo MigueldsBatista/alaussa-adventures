@@ -2,6 +2,7 @@
 #define __MAP_H__
 
 #include <SDL2/SDL.h>
+#include "player.h"
 #define MAX_MAP_WIDTH 100
 #define MAX_MAP_HEIGHT 100
 
@@ -51,5 +52,8 @@ void renderMap(SDL_Renderer* renderer, SDL_Texture* bloco_texture);
  */
 void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camera_position, int screen_width, int screen_height);
 
+bool checkCollision(SDL_Rect a, SDL_Rect b);
+
+bool checkPlayerBlockCollision(Player *player);
 
 #endif // !__MAP_H__

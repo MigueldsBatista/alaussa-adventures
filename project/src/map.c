@@ -56,31 +56,6 @@ void renderMap(SDL_Renderer* renderer, SDL_Texture* bloco_texture) {
 }
 
 
-// Function to check for collision between two rectangles
-bool checkCollision(SDL_Rect a, SDL_Rect b) {
-    // Check if the rectangles overlap
-    if (a.x + a.w <= b.x || a.x >= b.x + b.w || a.y + a.h <= b.y || a.y >= b.y + b.h) {
-        return false;
-    }
-    return true;
-}
-
-// Function to check for collisions between the player and blocks
-bool checkPlayerBlockCollision(Player *player) {
-    SDL_Rect playerRect = { (int)player->position.x, (int)player->position.y, player->width, player->height };
-    for (int y = 0; y < gameMap.height; y++) {
-        for (int x = 0; x < gameMap.width; x++) {
-            if (gameMap.tiles[y][x] > 0) { // If the tile is not empty
-                SDL_Rect blockRect = { x * 32, y * 32, 32, 32 };
-                if (checkCollision(playerRect, blockRect)) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
 void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camera_position, int screen_width, int screen_height) {
     //TODO: Implementar a função renderBackground
     int bg_width = 725;  // Largura da imagem de fundo
@@ -100,4 +75,37 @@ void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camer
         SDL_Rect dst_rect2 = { bg_width - parallax_offset, 0, parallax_offset, bg_height };
         SDL_RenderCopy(renderer, background, &src_rect2, &dst_rect2);
     }
+}
+
+// Function to check for collision between two rectangles
+bool checkCollision(SDL_Rect a, SDL_Rect b) {
+    // Check if the rectangles overlap
+    if (a.x + a.w <= b.x || a.x >= b.x + b.w || a.y + a.h <= b.y || a.y >= b.y + b.h) {
+        return false;
+    }
+    return true;
+}
+
+// Function to check for collisions between the player and blocks
+bool checkPlayerBlockCollision(Player *player) {
+    SDL_Rect playerRect = { (int)player->position.x, (int)player->position.y, player->width, player->height };
+    player->position.onGround = false;
+
+    for (int y = 0; y < gameMap.height; y++) {
+        for (int x = 0; x < gameMap.width; x++) {
+            if (gameMap.tiles[y][x] > 0) {
+                SDL_Rect blockRect = { x * 32, y * 32, 32, 32 };
+
+                if (checkCollision(playerRect, blockRect)) {
+                    if (playerRect.y + playerRect.h <= blockRect.y + 5 && player->position.velY >= 0) {
+                        player->position.onGround = true;
+                        player->position.y = blockRect.y - player->height;
+                    } else if (playerRect.x + playerRect.w > blockRect.x && playerRect.x < blockRect.x + blockRect.w) {
+                    }
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
