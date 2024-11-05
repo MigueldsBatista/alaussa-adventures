@@ -40,8 +40,17 @@ typedef struct {
      int speedX, speedY;
      int health;
      bool isActive;
-     SDL_Texture *texture;
+     SDL_Texture **animationFrames;
+     int totalFrames;
+     int currentFrame;
+     double animationTime;
 } Enemy;
+
+typedef enum {
+     ENEMY_IDLE, //repouso
+     ENEMY_MOVE_LEFT,
+     ENEMY_MOVE_RIGHT,
+} EnemyAction;
 
 
 /**

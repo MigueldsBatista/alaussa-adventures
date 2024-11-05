@@ -9,7 +9,9 @@
 #include "map.h"
 #include "enemy.h"
 #include "menu.h"
+#include "game.h"
 #include "sprite.h"
+#include "utils.h"
 
 int main(int argc, char* argv[]) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -103,15 +105,27 @@ int main(int argc, char* argv[]) {
     if (running) {
         // Inicializa o jogador e entra no loop principal do jogo
         Player player;
+        Enemy enemies;
         initPlayer(&player, renderer);
+        //initEnemyStack(enemies, 5, enemies.animationFrames[0], enemies.animationFrames[1]);
 
         double gravity = 250.0;
         double deltaTime = 0.09; // Aproximadamente 60 FPS
         while (running) {
             SDL_Event event;
-            while (SDL_PollEvent(&event)) {
+             while (SDL_PollEvent(&event)) {
                 if (event.type == SDL_QUIT) {
                     running = false;
+                } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
+                    printf("Jogo pausado. Pressione P para despausar.\n");
+                    bool paused = true;
+                    while (paused) {
+                        while (SDL_PollEvent(&event)) {
+                            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
+                                paused = false;
+                            }
+                        }
+                    }
                 }
                 PlayerAction action = handlePlayerInput(&event, &player);
                 printf("Ação do jogador: %d\n", action);
