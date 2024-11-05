@@ -1,5 +1,7 @@
 #ifndef __ENEMY_H__
 #define __ENEMY_H__
+#define MAX_ENEMIES 5
+
 
 #include <stdbool.h>
 #include <SDL2/SDL.h>
@@ -52,6 +54,11 @@ typedef enum {
      ENEMY_MOVE_RIGHT,
 } EnemyAction;
 
+typedef struct {
+    Enemy enemies[MAX_ENEMIES];
+    int currentEnemyIndex;
+    double spawnTimer;
+} EnemyQueue;
 
 /**
  * @brief Initializes the enemy entity.
@@ -88,6 +95,12 @@ void deactivateEnemy(Enemy *enemy);
 void damageEnemy(Enemy *enemy, int damage);
 
 void freeEnemyAnimations(Enemy *enemy);
+
+void initEnemyQueue(EnemyQueue *queue, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer);
+
+void updateEnemyQueue(EnemyQueue *queue, double deltaTime);
+
+void renderEnemyQueue(EnemyQueue *queue, SDL_Renderer *renderer);
 
 #endif // __ENEMY_H__
 

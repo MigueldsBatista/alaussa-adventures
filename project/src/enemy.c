@@ -3,18 +3,40 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "enemy.h"
+#include <stdbool.h>
 
 #define SCREEN_WIDTH 725
 #define SCREEN_HEIGHT 400
 
-void initEnemyStack(Enemy *enemies, int numEnemies, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer) {
-    for (int i = 0; i < numEnemies; i++) {
-        int x = rand() % (SCREEN_WIDTH - 64);
-        int y = rand() % (SCREEN_HEIGHT - 64);
-        int speedX = (rand() % 200) - 100; // Velocidade aleatória entre -100 e 100
-        int speedY = (rand() % 200) - 100; // Velocidade aleatória entre -100 e 100
-        int health = 150; // Saúde = 150
-        initEnemy(&enemies[i], x, y, speedX, speedY, health, animationFrames, totalFrames, renderer);
+
+
+void initEnemyQueue(EnemyQueue *queue, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer) {
+    queue->currentEnemyIndex = 0;
+    queue->spawnTimer = 0.0;
+
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        initEnemy(&queue->enemies[i], rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT, rand() % 100 - 50, rand() % 100 - 50, 100, animationFrames, totalFrames, renderer);
+        queue->enemies[i].isActive = false; // Start inactive
+    }
+}
+
+void updateEnemyQueue(EnemyQueue *queue, double deltaTime) {
+    queue->spawnTimer += deltaTime;
+
+    if (queue->spawnTimer >= 5.0 && queue->currentEnemyIndex < MAX_ENEMIES) {
+        queue->enemies[queue->currentEnemyIndex].isActive = true;
+        queue->currentEnemyIndex++;
+        queue->spawnTimer = 0.0;
+    }
+
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        updateEnemy(&queue->enemies[i], deltaTime);
+    }
+}
+
+void renderEnemyQueue(EnemyQueue *queue, SDL_Renderer *renderer) {
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        renderEnemy(&queue->enemies[i], renderer);
     }
 }
 
