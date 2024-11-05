@@ -22,7 +22,7 @@ void renderizarBotao(SDL_Renderer *renderer, Botao *botao, TTF_Font *font, const
 
     SDL_Rect textRect = {
         botao->rect.x + (botao->rect.w - text_width) / 2,
-        botao->rect.y + (botao->rect.h - text_height) / 2,
+        botao->rect.y + (botao->rect.h - text_height) / 2, 
         text_width,
         text_height
     };
