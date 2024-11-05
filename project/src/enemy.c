@@ -60,7 +60,7 @@ void loadAnimationsEnemy(Enemy *enemy, SDL_Renderer *renderer) {
     enemy->totalFrames = frameCount;
 
     for (int i = 0; i < frameCount; i++) {
-        char filename[50];
+        char filename[100];
         snprintf(filename, sizeof(filename), "./project/assets/MovEnemy/enemy_idle_%d.png", i);
 
         SDL_Surface *surface = IMG_Load(filename);

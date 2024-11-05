@@ -105,9 +105,7 @@ int main(int argc, char* argv[]) {
     if (running) {
         // Inicializa o jogador e entra no loop principal do jogo
         Player player;
-        Enemy *enemies = NULL;
         initPlayer(&player, renderer);
-        initEnemyStack(enemies, 5, enemies->animationFrames, enemies->totalFrames, renderer);
 
         double gravity = 250.0;
         double deltaTime = 0.09; // Aproximadamente 60 FPS

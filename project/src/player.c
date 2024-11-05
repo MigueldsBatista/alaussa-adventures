@@ -127,7 +127,7 @@ void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *rend
     player->totalFrames = frameCount;
 
     for (int i = 0; i < frameCount; i++) {
-        char filename[50];
+        char filename[100];
 
         if (action == PLAYER_MOVE_LEFT) {
             sprintf(filename, "project/assets/MovPlayer/player_left_%d.png", i);
