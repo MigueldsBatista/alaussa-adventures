@@ -60,7 +60,7 @@ typedef enum {
  * position, health, and any other relevant attributes. It should be called
  * before the enemy is used in the game.
  */
-void initEnemy();
+void initEnemy(Enemy *enemy, int x, int y, int speedX, int speedY, int health, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer);
 
 /**
  * @brief Updates the state of the enemy.
@@ -68,7 +68,7 @@ void initEnemy();
  * This function is responsible for updating the enemy's state, which may include
  * position, health, behavior, and other attributes relevant to the game's logic.
  */
-void updateEnemy();
+void updateEnemy(Enemy *enemy, double deltaTime);
 
 /**
  * @brief Renders the enemy on the screen.
@@ -77,8 +77,18 @@ void updateEnemy();
  * on the screen. It handles all the necessary graphical operations
  * to ensure the enemy is displayed correctly.
  */
-void renderEnemy();
+void renderEnemy(Enemy *enemy, SDL_Renderer *renderer);
 
+void initEnemyStack(Enemy *enemies, int numEnemies, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer);
+
+void loadAnimationsEnemy(Enemy *enemy, SDL_Renderer *renderer);
+
+void deactivateEnemy(Enemy *enemy);
+
+void damageEnemy(Enemy *enemy, int damage);
+
+void freeEnemyAnimations(Enemy *enemy);
 
 #endif // __ENEMY_H__
+
 

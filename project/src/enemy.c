@@ -6,7 +6,6 @@
 
 #define SCREEN_WIDTH 725
 #define SCREEN_HEIGHT 400
-#define MAX_ENEMIES 10  
 
 void initEnemyStack(Enemy *enemies, int numEnemies, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer) {
     for (int i = 0; i < numEnemies; i++) {
@@ -16,6 +15,18 @@ void initEnemyStack(Enemy *enemies, int numEnemies, SDL_Texture **animationFrame
         int speedY = (rand() % 200) - 100; // Velocidade aleatória entre -100 e 100
         int health = 150; // Saúde = 150
         initEnemy(&enemies[i], x, y, speedX, speedY, health, animationFrames, totalFrames, renderer);
+    }
+}
+
+void renderEnemy(Enemy *enemy, SDL_Renderer *renderer) {
+    if (enemy->isActive && enemy->animationFrames[enemy->currentFrame] != NULL) {
+        SDL_Rect dstRect;
+        dstRect.x = enemy->x;
+        dstRect.y = enemy->y;
+        dstRect.w = 64;
+        dstRect.h = 64;
+
+        SDL_RenderCopy(renderer, enemy->animationFrames[enemy->currentFrame], NULL, &dstRect);
     }
 }
 
@@ -99,17 +110,6 @@ void updateEnemy(Enemy *enemy, double deltaTime) {
     }
 }
 
-void renderEnemy(Enemy *enemy, SDL_Renderer *renderer) {
-    if (enemy->isActive && enemy->animationFrames[enemy->currentFrame] != NULL) {
-        SDL_Rect dstRect;
-        dstRect.x = enemy->x;
-        dstRect.y = enemy->y;
-        dstRect.w = 64;
-        dstRect.h = 64;
-
-        SDL_RenderCopy(renderer, enemy->animationFrames[enemy->currentFrame], NULL, &dstRect);
-    }
-}
 
 void deactivateEnemy(Enemy *enemy) {
     enemy->isActive = false;
