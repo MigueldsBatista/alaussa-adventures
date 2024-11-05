@@ -38,14 +38,23 @@ Funções para o comportamento e animação dos inimigos.
  * The SDL texture used for rendering the enemy.
  */
 typedef struct {
-     int x, y;
-     int speedX, speedY;
-     int health;
-     bool isActive;
-     SDL_Texture **animationFrames;
-     int totalFrames;
-     int currentFrame;
-     double animationTime;
+
+    int x, y;
+
+    int speedX, speedY;
+
+    int health;
+
+    bool isActive;
+
+    SDL_Texture **animationFrames;
+
+    int totalFrames;
+
+    int currentFrame;
+
+    double animationTime;
+
 } Enemy;
 
 typedef enum {
@@ -96,7 +105,9 @@ void damageEnemy(Enemy *enemy, int damage);
 
 void freeEnemyAnimations(Enemy *enemy);
 
-void initEnemyQueue(EnemyQueue *queue, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer);
+void initEnemyQueue(EnemyQueue *queue);
+
+void spawnEnemy(EnemyQueue *queue, int x, int y, int speedX, int speedY, int health, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer);
 
 void updateEnemyQueue(EnemyQueue *queue, double deltaTime);
 

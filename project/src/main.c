@@ -106,6 +106,8 @@ int main(int argc, char* argv[]) {
         // Inicializa o jogador e entra no loop principal do jogo
         Player player;
         initPlayer(&player, renderer);
+        EnemyQueue enemyQueue;
+        initEnemyQueue(&enemyQueue);
 
         double gravity = 250.0;
         double deltaTime = 0.09; // Aproximadamente 60 FPS
@@ -129,7 +131,27 @@ int main(int argc, char* argv[]) {
                 printf("Ação do jogador: %d\n", action);
             }
 
+            // Coordenadas e propriedades dos inimigos
+            int enemyX = 100;
+            int enemyY = 100;
+            int enemySpeedX = 50;
+            int enemySpeedY = 0;
+            int enemyHealth = 100;
+
+            // Carregar frames de animação do inimigo
+            SDL_Texture* enemyFrames[2];
+            enemyFrames[0] = loadTexture("./project/assets/MovEnemy/enemy_idle_0.png", renderer);
+            enemyFrames[1] = loadTexture("./project/assets/MovEnemy/enemy_idle_1.png", renderer);
+
+            // Spawn de inimigos
+            spawnEnemy(&enemyQueue, enemyX, enemyY, enemySpeedX, enemySpeedY, enemyHealth, enemyFrames, 2, renderer);
+
+            // Renderizar inimigos
+            renderEnemyQueue(&enemyQueue, renderer);
+
             updatePlayer(&player, gravity, deltaTime, renderer);
+            updateEnemyQueue(&enemyQueue, deltaTime);
+
 
             // Implementação da lógica do chão e limites da tela
             if (player.position.y + player.height >= GROUND_LEVEL) {
@@ -155,7 +177,7 @@ int main(int argc, char* argv[]) {
 
             renderMap(renderer, bloco_texture);
 
-
+            // Desenha o jogador
             renderPlayer(&player, renderer);
             SDL_RenderPresent(renderer);
 

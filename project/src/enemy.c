@@ -8,35 +8,34 @@
 #define SCREEN_WIDTH 725
 #define SCREEN_HEIGHT 400
 
-
-
-void initEnemyQueue(EnemyQueue *queue, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer) {
+void initEnemyQueue(EnemyQueue *queue) {
     queue->currentEnemyIndex = 0;
     queue->spawnTimer = 0.0;
-
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        initEnemy(&queue->enemies[i], rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT, rand() % 100 - 50, rand() % 100 - 50, 100, animationFrames, totalFrames, renderer);
-        queue->enemies[i].isActive = false; // Start inactive
+        queue->enemies[i].isActive = false;
+    }
+}
+
+void spawnEnemy(EnemyQueue *queue, int x, int y, int speedX, int speedY, int health, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer) {
+    if (queue->currentEnemyIndex < MAX_ENEMIES) {
+        initEnemy(&queue->enemies[queue->currentEnemyIndex], x, y, speedX, speedY, health, animationFrames, totalFrames, renderer);
+        queue->currentEnemyIndex++;
     }
 }
 
 void updateEnemyQueue(EnemyQueue *queue, double deltaTime) {
-    queue->spawnTimer += deltaTime;
-
-    if (queue->spawnTimer >= 5.0 && queue->currentEnemyIndex < MAX_ENEMIES) {
-        queue->enemies[queue->currentEnemyIndex].isActive = true;
-        queue->currentEnemyIndex++;
-        queue->spawnTimer = 0.0;
-    }
-
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        updateEnemy(&queue->enemies[i], deltaTime);
+        if (queue->enemies[i].isActive) {
+            updateEnemy(&queue->enemies[i], deltaTime);
+        }
     }
 }
 
 void renderEnemyQueue(EnemyQueue *queue, SDL_Renderer *renderer) {
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        renderEnemy(&queue->enemies[i], renderer);
+        if (queue->enemies[i].isActive) {
+            renderEnemy(&queue->enemies[i], renderer);
+        }
     }
 }
 
@@ -59,11 +58,10 @@ void initEnemy(Enemy *enemy, int x, int y, int speedX, int speedY, int health, S
     enemy->speedY = speedY;
     enemy->health = health;
     enemy->isActive = true;
-    enemy->animationFrames = animationFrames;
+    enemy->animationFrames = NULL;
     enemy->totalFrames = totalFrames;
     enemy->currentFrame = 0;
     enemy->animationTime = 0.0;
-
     loadAnimationsEnemy(enemy, renderer);
 }
 
