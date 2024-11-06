@@ -4,6 +4,7 @@
 #include "map.h"
 #include <stdbool.h>
 #include "player.h"
+const float escala = 0.5; // Ajuste conforme a proporção da tela minimizada
 
 
 // Estrutura de dados para o mapa
@@ -88,19 +89,29 @@ bool checkCollision(SDL_Rect a, SDL_Rect b) {
 
 // Function to check for collisions between the player and blocks
 bool checkPlayerBlockCollision(Player *player) {
-    SDL_Rect playerRect = { (int)player->position.x, (int)player->position.y, player->width, player->height };
-    player->position.onGround = false;
+    SDL_Rect playerRect = { 
+        (int)(player->position.x * escala), 
+        (int)(player->position.y * escala), 
+        (int)(player->width * escala), 
+        (int)(player->height * escala) 
+    };
+    player->position.onGround = true;
 
     for (int y = 0; y < gameMap.height; y++) {
         for (int x = 0; x < gameMap.width; x++) {
             if (gameMap.tiles[y][x] > 0) {
-                SDL_Rect blockRect = { x * 32, y * 32, 32, 32 };
+                SDL_Rect blockRect = { 
+                    (int)(x * 32 * escala), 
+                    (int)(y * 32 * escala), 
+                    (int)(32 * escala), 
+                    (int)(32 * escala) 
+                };
 
                 if (checkCollision(playerRect, blockRect)) {
+                    // Verifica se o jogador está em cima do bloco e ajusta a posição
                     if (playerRect.y + playerRect.h <= blockRect.y + 5 && player->position.velY >= 0) {
                         player->position.onGround = true;
-                        player->position.y = blockRect.y - player->height;
-                    } else if (playerRect.x + playerRect.w > blockRect.x && playerRect.x < blockRect.x + blockRect.w) {
+                        player->position.y = blockRect.y / escala - player->height; // Desfaz a escala para a posição original
                     }
                     return true;
                 }

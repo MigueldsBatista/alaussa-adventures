@@ -55,7 +55,8 @@ void mostrarInstrucoes(SDL_Renderer *renderer, TTF_Font *font) {
     renderizarTexto(renderer, font, "mova o personagem no 'w,a,s,d'", corTexto, 10, 100);
     renderizarTexto(renderer, font, "para pular pode ser tanto no W quanto no espaco", corTexto, 10, 150);
     renderizarTexto(renderer, font, "se quiser sair clique na tela anterior 'sair'", corTexto, 10, 200);
-    renderizarTexto(renderer, font, "Pressione 'esc' para voltar ao menu.", corTexto, 100, 250);
+    renderizarTexto(renderer, font, "Pressione 'esc' para voltar ao menu.", corTexto, 10, 250);
+    renderizarTexto(renderer, font, "Pressione 'P' para pausar o jogo.", corTexto, 10, 300);
 
     SDL_RenderPresent(renderer);
 
