@@ -26,7 +26,7 @@ void playMusic(Mix_Music* music) {
         return;
     }
     
-    Mix_VolumeMusic(15);//define o volume maximo da musica pelo q eu li se botar MIX_MAX_VOLUME fica no volume que braz mandou a musica
+    Mix_VolumeMusic(0);//define o volume maximo da musica pelo q eu li se botar MIX_MAX_VOLUME fica no volume que braz mandou a musica
     if (Mix_PlayMusic(music, -1) == -1) {
         printf("Erro ao tocar música: %s\n", Mix_GetError());
     } else {

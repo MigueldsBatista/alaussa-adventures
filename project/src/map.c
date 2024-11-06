@@ -86,7 +86,7 @@ bool checkCollision(SDL_Rect a, SDL_Rect b) {
     }
     return true;
 }
-
+/*
 // Function to check for collisions between the player and blocks
 bool checkPlayerBlockCollision(Player *player) {
     SDL_Rect playerRect = { 
@@ -95,11 +95,12 @@ bool checkPlayerBlockCollision(Player *player) {
         (int)(player->width * escala), 
         (int)(player->height * escala) 
     };
-    player->position.onGround = true;
+
+    player->position.onGround = false;  // Assume que o jogador está no ar até encontrar um bloco embaixo
 
     for (int y = 0; y < gameMap.height; y++) {
         for (int x = 0; x < gameMap.width; x++) {
-            if (gameMap.tiles[y][x] > 0) {
+            if (gameMap.tiles[y][x] > 0) {  // Somente checar blocos sólidos
                 SDL_Rect blockRect = { 
                     (int)(x * 32 * escala), 
                     (int)(y * 32 * escala), 
@@ -108,15 +109,91 @@ bool checkPlayerBlockCollision(Player *player) {
                 };
 
                 if (checkCollision(playerRect, blockRect)) {
-                    // Verifica se o jogador está em cima do bloco e ajusta a posição
+                    // Verifica se o jogador está em cima do bloco
                     if (playerRect.y + playerRect.h <= blockRect.y + 5 && player->position.velY >= 0) {
                         player->position.onGround = true;
-                        player->position.y = blockRect.y / escala - player->height; // Desfaz a escala para a posição original
+                        if (player->position.y + player->height > blockRect.y / escala) {
+                            // Ajusta gradualmente para a posição exata em cima do bloco
+                            player->position.y -= 1; 
+                        } else {
+                            // Se já estiver na posição correta, mantenha-o sobre o bloco
+                            player->position.y = blockRect.y / escala - player->height;
+                        }
+                        player->position.velY = 0;  // Zera a velocidade vertical
+                        return true;
                     }
-                    return true;
+                    // Verifica colisão por baixo do bloco
+                    else if (playerRect.y >= blockRect.y + blockRect.h - 5 && player->position.velY < 0) {
+                        player->position.y = (blockRect.y + blockRect.h) / escala;
+                        player->position.velY = 0;  // Zera a velocidade vertical ao colidir por baixo
+                        return true;
+                    }
+                    // Ajustes laterais para impedir "grude" nas laterais dos blocos
+                    else if (playerRect.x + playerRect.w > blockRect.x && playerRect.x < blockRect.x) {
+                        player->position.x = blockRect.x / escala - player->width + 1;  // Ajuste suave
+                    } 
+                    else if (playerRect.x < blockRect.x + blockRect.w && playerRect.x > blockRect.x) {
+                        player->position.x = (blockRect.x + blockRect.w) / escala - 1;  // Ajuste suave
+                    }
                 }
             }
         }
     }
     return false;
 }
+*/
+// Função para verificar colisões entre o jogador e blocos
+bool checkPlayerBlockCollision(Player *player) {
+    SDL_Rect playerRect = { 
+        (int)(player->position.x * escala), 
+        (int)(player->position.y * escala), 
+        (int)(player->width * escala), 
+        (int)(player->height * escala) 
+    };
+
+    player->position.onGround = false;  // Assume que o jogador está no ar até encontrar um bloco embaixo
+
+    for (int y = 0; y < gameMap.height; y++) {
+        for (int x = 0; x < gameMap.width; x++) {
+            if (gameMap.tiles[y][x] > 0) {  // Somente checar blocos sólidos
+                SDL_Rect blockRect = { 
+                    (int)(x * 32 * escala), 
+                    (int)(y * 32 * escala), 
+                    (int)(32 * escala), 
+                    (int)(32 * escala) 
+                };
+
+                if (checkCollision(playerRect, blockRect)) {
+                    // Colisão por cima (o jogador aterrissa no bloco)
+                    if (playerRect.y + playerRect.h <= blockRect.y + 5 && player->position.velY >= 0) {
+                        printf("Colisão por cima\n");
+                        player->position.onGround = true;
+                        player->position.y = blockRect.y / escala - player->height;  // Define a posição exata em cima do bloco
+                        player->position.velY = 0;  // Zera a velocidade vertical
+                        return true;
+                    }
+                    // Colisão por baixo (o jogador bate a cabeça no bloco)
+                    else if (playerRect.y >= blockRect.y + blockRect.h - 5 && player->position.velY < 0) {
+                        printf("Colisão por baixo\n");
+                        player->position.y = (blockRect.y + blockRect.h) / escala;
+                        player->position.velY = 0;  // Zera a velocidade vertical ao colidir por baixo
+                        return true;
+                    }
+                    // Colisão lateral (ajustes de posição horizontal)
+                    else if (playerRect.x + playerRect.w > blockRect.x && playerRect.x < blockRect.x) {
+                        printf("Colisão pela esquerda\n");
+                        player->position.x = blockRect.x / escala - player->width;  // Ajuste suave pela esquerda
+                        player->position.velX = 0;  // Zera a velocidade horizontal
+                    } 
+                    else if (playerRect.x < blockRect.x + blockRect.w && playerRect.x > blockRect.x) {
+                        printf("Colisão pela direita\n");
+                        player->position.x = (blockRect.x + blockRect.w) / escala;  // Ajuste suave pela direita
+                        player->position.velX = 0;  // Zera a velocidade horizontal
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+

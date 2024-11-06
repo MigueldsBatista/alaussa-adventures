@@ -158,13 +158,12 @@ int main(int argc, char* argv[]) {
                 player.position.y = GROUND_LEVEL - player.height;
                 player.position.velY = 0;
                 player.position.onGround = true;
-            } else {
-                player.position.onGround = false;
             }
 
             if (player.position.x < 0) {
                 player.position.x = 0;
-            } else if (player.position.x + player.width > SCREEN_WIDTH) {
+            } 
+            else if (player.position.x + player.width > SCREEN_WIDTH) {
                 player.position.x = SCREEN_WIDTH - player.width;
             }
 

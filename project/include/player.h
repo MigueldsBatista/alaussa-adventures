@@ -40,6 +40,7 @@ typedef struct {
     Position position;             // Posição do jogador
     int width;
     int height;
+    PlayerAction currentAction;
 } Player;
 
 /**
