@@ -30,7 +30,6 @@ void updatePlayer(Player *player, double gravity, double deltaTime, SDL_Renderer
         
     player->position.velY += gravity * deltaTime;
 
-
     player->position.x += (player->position.velX * deltaTime);
     player->position.y += (player->position.velY * deltaTime);
 
@@ -60,10 +59,6 @@ void updatePlayer(Player *player, double gravity, double deltaTime, SDL_Renderer
         loadAnimationFrames(player, PLAYER_MOVE_LEFT, renderer);
         }
     }
-
-
-
-
         
     else if (!player->position.onGround) {
         // Se está no ar, define a animação de pulo
