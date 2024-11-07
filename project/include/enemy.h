@@ -1,8 +1,9 @@
 #ifndef __ENEMY_H__
 #define __ENEMY_H__
 
-#include "map.h"
+
 #include "player.h"
+#include "map.h"
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
@@ -68,5 +69,7 @@ void damageEnemy(Enemy *enemy);
 
 void killEnemyIfDead(Enemy *enemy);
 
+bool checkEnemyBlockCollision(Enemy *enemy);
 
+void renderEnemy(Enemy *enemy, SDL_Renderer *renderer);
 #endif // __ENEMY_H__

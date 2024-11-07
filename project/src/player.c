@@ -51,8 +51,8 @@ void updatePlayer(Player *player, double gravity, double deltaTime, SDL_Renderer
     player->position.velY += gravity * deltaTime;
 
     // Limita a velocidade de queda
-    if (player->position.velY > 120) {
-        player->position.velY = 120;
+    if (player->position.velY > 100) {
+        player->position.velY = 100;
     }
 
     if (player->position.velX > 150) {
@@ -190,7 +190,7 @@ void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *rend
 
 void jumpPlayer(Player *player) {
     if (player->position.onGround) {
-        player->position.velY = -450.0;
+        player->position.velY = -255.0;
         player->position.onGround = false;
     }
 }

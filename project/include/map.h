@@ -3,7 +3,6 @@
 
 #include <SDL2/SDL.h>
 #include "player.h"
-#include "enemy.h"
 
 #define MAX_MAP_WIDTH 100
 #define MAX_MAP_HEIGHT 100
@@ -61,7 +60,5 @@ void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camer
 bool checkCollision(SDL_Rect a, SDL_Rect b);
 
 bool checkPlayerBlockCollision(Player *player);
-
-bool checkEnemyBlockCollision(Enemy *enemy);
 
 #endif // !__MAP_H__

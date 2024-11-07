@@ -3,11 +3,20 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "enemy.h"
-#include "player.h"
 #include "map.h"
+#include "player.h"
 #include <stdbool.h>
 
-const float escala = 0.5;
+const float escala2 = 0.5;
+
+// Estrutura de dados para o mapa
+typedef struct {
+    int width;
+    int height;
+    int tiles[MAX_MAP_HEIGHT][MAX_MAP_WIDTH]; // Exemplo de representação do mapa
+} Map;
+
+Map gameEnemyMap; // Instância do mapa
 
 void spawnEnemiesFromMap(const char* map_file, DoubleLinkedListEnemy **enemyList) {
     FILE* file = fopen(map_file, "r");
@@ -16,20 +25,32 @@ void spawnEnemiesFromMap(const char* map_file, DoubleLinkedListEnemy **enemyList
         return;
     }
 
-    int width, height;
-    fscanf(file, "%d %d", &width, &height);
+    // Lê a largura e a altura do mapa
+    if (fscanf(file, "%d %d", &gameEnemyMap.width, &gameEnemyMap.height) != 2) {
+        fprintf(stderr, "Erro ao ler largura e altura do mapa.\n");
+        fclose(file);
+        return;
+    }
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            int tile;
-            fscanf(file, "%d", &tile);
-            if (tile == 2) {
+    // Leitura dos tiles do mapa
+    for (int y = 0; y < gameEnemyMap.height; y++) {
+        for (int x = 0; x < gameEnemyMap.width; x++) {
+            // Lê o valor do tile diretamente na estrutura do mapa
+            if (fscanf(file, "%d", &gameEnemyMap.tiles[y][x]) != 1) {
+                fprintf(stderr, "Erro ao ler tile no mapa na posição (%d, %d).\n", x, y);
+                fclose(file);
+                return;
+            }
+
+            // Verifica se o tile corresponde a um inimigo
+            if (gameEnemyMap.tiles[y][x] == 2) {
                 Enemy *newEnemy = (Enemy *)malloc(sizeof(Enemy));
                 if (!newEnemy) {
                     fprintf(stderr, "Erro ao alocar memória para o novo inimigo.\n");
                     fclose(file);
                     return;
                 }
+                
                 newEnemy->position.x = x * 32; 
                 newEnemy->position.y = y * 32; 
                 newEnemy->position.velX = 0;    
@@ -41,14 +62,18 @@ void spawnEnemiesFromMap(const char* map_file, DoubleLinkedListEnemy **enemyList
                 newEnemy->currentFrame = 0; 
                 newEnemy->currentEnemyAction = ENEMY_MOVE_LEFT;
                 initLifeEnemy(newEnemy);
-                int cont = 0;
+                
+                // Incrementar cont para IDs únicos
+                static int cont = 0; // Usar cont como variável estática para manter o estado
                 cont++;
+                
                 addEnemyDoubleLinkedList(enemyList, newEnemy, cont);
             }
         }
     }
     fclose(file);
 }
+
 
 void initLifeEnemy(Enemy *enemy) {
     enemy->Becker = NULL;
@@ -91,8 +116,8 @@ void addEnemyDoubleLinkedList(DoubleLinkedListEnemy **head, Enemy *newEnemy, int
 void updateEnemy(Enemy *enemy, double gravity, double deltaTime, Player *player, SDL_Renderer *renderer) {
     enemy->position.velY += gravity * deltaTime;
 
-    if (enemy->position.velY > 120) {
-        enemy->position.velY = 120;
+    if (enemy->position.velY > 100) {
+        enemy->position.velY = 100;
     }
 
     if (enemy->position.velX > 150) {
@@ -184,17 +209,17 @@ bool checkEnemyCollision(SDL_Rect a, SDL_Rect b) {
 
 bool checkPlayerEnemyColision(Player *player, Enemy *enemy) {
     SDL_Rect playerRect = { 
-        (int)(player->position.x * escala), 
-        (int)(player->position.y * escala), 
-        (int)(player->width * escala), 
-        (int)(player->height * escala) 
+        (int)(player->position.x * escala2), 
+        (int)(player->position.y * escala2), 
+        (int)(player->width * escala2), 
+        (int)(player->height * escala2) 
     };
 
     SDL_Rect enemyRect = { 
-        (int)(enemy->position.x * escala), 
-        (int)(enemy->position.y * escala), 
-        (int)(enemy->width * escala), 
-        (int)(enemy->height * escala) 
+        (int)(enemy->position.x * escala2), 
+        (int)(enemy->position.y * escala2), 
+        (int)(enemy->width * escala2), 
+        (int)(enemy->height * escala2) 
     };
 
     if (checkEnemyCollision(playerRect, enemyRect)) {
@@ -231,4 +256,66 @@ void killEnemyIfDead(Enemy *enemy) {
         enemy->Becker = NULL;
     }
     return;
+}
+
+// Função para verificar colisões entre o jogador e blocos
+bool checkEnemyBlockCollision(Enemy *enemy) {
+    SDL_Rect enemyRect = { 
+        (int)(enemy->position.x * escala2), 
+        (int)(enemy->position.y * escala2), 
+        (int)(enemy->width * escala2), 
+        (int)(enemy->height * escala2) 
+    };
+
+    enemy->position.onGround = false;  // Assume que o jogador está no ar até encontrar um bloco embaixo
+
+    for (int y = 0; y < gameEnemyMap.height; y++) {
+        for (int x = 0; x < gameEnemyMap.width; x++) {
+            if (gameEnemyMap.tiles[y][x] > 0) {  // Somente checar blocos sólidos
+                SDL_Rect blockRect = { 
+                    (int)(x * 64 * escala2), 
+                    (int)(y * 64 * escala2), 
+                    (int)(64 * escala2), 
+                    (int)(64 * escala2) 
+                };
+
+                if (checkCollision(enemyRect, blockRect)) {
+                    // Colisão por cima (o jogador aterrissa no bloco)
+                    if (enemyRect.y + enemyRect.h <= blockRect.y + 5 && enemy->position.velY >= 0) {
+                        enemy->position.onGround = true;
+                        enemy->position.y = blockRect.y / escala2 - enemy->height;  // Define a posição exata em cima do bloco
+                        enemy->position.velY = 0;  // Zera a velocidade vertical
+                        return true;
+                    }
+                    // Colisão por baixo (o jogador bate a cabeça no bloco)
+                    else if (enemyRect.y >= blockRect.y + blockRect.h - 5 && enemy->position.velY < 0) {
+                        enemy->position.y = (blockRect.y + blockRect.h) / escala2;
+                        enemy->position.velY = 0;  // Zera a velocidade vertical ao colidir por baixo
+                        return true;
+                    }
+                    // Colisão lateral (ajustes de posição horizontal)
+                    else if (enemyRect.x + enemyRect.w > blockRect.x && enemyRect.x < blockRect.x) {
+                        enemy->position.x = blockRect.x / escala2 - enemy->width;  // Ajuste suave pela esquerda
+                        enemy->position.velX = 0;  // Zera a velocidade horizontal
+                    } 
+                    else if (enemyRect.x < blockRect.x + blockRect.w && enemyRect.x > blockRect.x) {
+                        enemy->position.x = (blockRect.x + blockRect.w) / escala2;  // Ajuste suave pela direita
+                        enemy->position.velX = 0;  // Zera a velocidade horizontal
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+
+void renderEnemy(Enemy *enemy, SDL_Renderer *renderer) {
+    SDL_Rect dstRect = {
+        .x = (int)enemy->position.x,
+        .y = (int)enemy->position.y,
+        .w = enemy->width,
+        .h = enemy->height
+    };
+    SDL_RenderCopy(renderer, enemy->animationEnemyFrames[enemy->currentFrame], NULL, &dstRect);
 }
