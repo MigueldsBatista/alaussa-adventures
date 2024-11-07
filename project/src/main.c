@@ -14,7 +14,7 @@
 #include "utils.h"
 
 int main(int argc, char* argv[]) {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("Erro ao inicializar SDL: %s\n", SDL_GetError());
         return 1;
     }
@@ -104,10 +104,28 @@ int main(int argc, char* argv[]) {
 
     if (running) {
         // Inicializa o jogador e entra no loop principal do jogo
+        SDL_Rect camera = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT}; // Define a câmera com o tamanho da tela
+        camera.x = player.position.x + player.width / 2 - SCREEN_WIDTH / 2;
+        camera.y = player.position.y + player.height / 2 - SCREEN_HEIGHT / 2;
+
+        // Limita a câmera dentro dos limites do mapa (assumindo o mapa em blocos de 64x64)
+        int mapWidth = gameMap.width * 64;
+        int mapHeight = gameMap.height * 64;
+
+        if (camera.x < 0) {
+            camera.x = 0;
+        }
+        if (camera.y < 0) {
+            camera.y = 0;
+        }
+        if (camera.x > mapWidth - SCREEN_WIDTH) {
+            camera.x = mapWidth - SCREEN_WIDTH;
+        }
+        if (camera.y > mapHeight - SCREEN_HEIGHT) {
+            camera.y = mapHeight - SCREEN_HEIGHT;
+        }
         Player player;
         initPlayer(&player, renderer);
-        EnemyQueue enemyQueue;
-        initEnemyQueue(&enemyQueue);
 
         double gravity = 250.0;
         double deltaTime = 0.09; // Aproximadamente 60 FPS
@@ -131,26 +149,8 @@ int main(int argc, char* argv[]) {
                 printf("Ação do jogador: %d\n", action);
             }
 
-            // Coordenadas e propriedades dos inimigos
-            int enemyX = 100;
-            int enemyY = 100;
-            int enemySpeedX = 50;
-            int enemySpeedY = 0;
-            int enemyHealth = 100;
-
-            // Carregar frames de animação do inimigo
-            SDL_Texture* enemyFrames[2];
-            enemyFrames[0] = loadTexture("./project/assets/MovEnemy/enemy_idle_0.png", renderer);
-            enemyFrames[1] = loadTexture("./project/assets/MovEnemy/enemy_idle_1.png", renderer);
-
-            // Spawn de inimigos
-            spawnEnemy(&enemyQueue, enemyX, enemyY, enemySpeedX, enemySpeedY, enemyHealth, enemyFrames, 2, renderer);
-
-            // Renderizar inimigos
-            renderEnemyQueue(&enemyQueue, renderer);
-
+            
             updatePlayer(&player, gravity, deltaTime, renderer);
-            updateEnemyQueue(&enemyQueue, deltaTime);
 
 
             // Implementação da lógica do chão e limites da tela

@@ -3,155 +3,232 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "enemy.h"
+#include "player.h"
+#include "map.h"
 #include <stdbool.h>
 
-#define SCREEN_WIDTH 725
-#define SCREEN_HEIGHT 400
+const float escala = 0.5;
 
-void initEnemyQueue(EnemyQueue *queue) {
-    queue->currentEnemyIndex = 0;
-    queue->spawnTimer = 0.0;
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        queue->enemies[i].isActive = false;
+void spawnEnemiesFromMap(const char* map_file, DoubleLinkedListEnemy **enemyList) {
+    FILE* file = fopen(map_file, "r");
+    if (!file) {
+        printf("Erro ao abrir o arquivo do mapa: %s\n", map_file);
+        return;
     }
-}
 
-void spawnEnemy(EnemyQueue *queue, int x, int y, int speedX, int speedY, int health, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer) {
-    if (queue->currentEnemyIndex < MAX_ENEMIES) {
-        initEnemy(&queue->enemies[queue->currentEnemyIndex], x, y, speedX, speedY, health, animationFrames, totalFrames, renderer);
-        queue->currentEnemyIndex++;
-    }
-}
+    int width, height;
+    fscanf(file, "%d %d", &width, &height);
 
-void updateEnemyQueue(EnemyQueue *queue, double deltaTime) {
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        if (queue->enemies[i].isActive) {
-            updateEnemy(&queue->enemies[i], deltaTime);
-        }
-    }
-}
-
-void renderEnemyQueue(EnemyQueue *queue, SDL_Renderer *renderer) {
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        if (queue->enemies[i].isActive) {
-            renderEnemy(&queue->enemies[i], renderer);
-        }
-    }
-}
-
-void renderEnemy(Enemy *enemy, SDL_Renderer *renderer) {
-    if (enemy->isActive && enemy->animationFrames[enemy->currentFrame] != NULL) {
-        SDL_Rect dstRect;
-        dstRect.x = enemy->x;
-        dstRect.y = enemy->y;
-        dstRect.w = 64;
-        dstRect.h = 64;
-
-        SDL_RenderCopy(renderer, enemy->animationFrames[enemy->currentFrame], NULL, &dstRect);
-    }
-}
-
-void initEnemy(Enemy *enemy, int x, int y, int speedX, int speedY, int health, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer) {
-    enemy->x = x;
-    enemy->y = y;
-    enemy->speedX = speedX;
-    enemy->speedY = speedY;
-    enemy->health = health;
-    enemy->isActive = true;
-    enemy->animationFrames = NULL;
-    enemy->totalFrames = totalFrames;
-    enemy->currentFrame = 0;
-    enemy->animationTime = 0.0;
-    loadAnimationsEnemy(enemy, renderer);
-}
-
-void loadAnimationsEnemy(Enemy *enemy, SDL_Renderer *renderer) {
-    if (enemy->animationFrames != NULL) {
-        for (int i = 0; i < enemy->totalFrames; i++) {
-            if (enemy->animationFrames[i] != NULL) {
-                SDL_DestroyTexture(enemy->animationFrames[i]);
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int tile;
+            fscanf(file, "%d", &tile);
+            if (tile == 2) {
+                Enemy *newEnemy = (Enemy *)malloc(sizeof(Enemy));
+                if (!newEnemy) {
+                    fprintf(stderr, "Erro ao alocar memória para o novo inimigo.\n");
+                    fclose(file);
+                    return;
+                }
+                newEnemy->position.x = x * 32; 
+                newEnemy->position.y = y * 32; 
+                newEnemy->position.velX = 0;    
+                newEnemy->position.velY = 0;    
+                newEnemy->position.onGround = true; 
+                newEnemy->width = 32;  
+                newEnemy->height = 32; 
+                newEnemy->totalFrames = 0; 
+                newEnemy->currentFrame = 0; 
+                newEnemy->currentEnemyAction = ENEMY_MOVE_LEFT;
+                initLifeEnemy(newEnemy);
+                int cont = 0;
+                cont++;
+                addEnemyDoubleLinkedList(enemyList, newEnemy, cont);
             }
         }
-        free(enemy->animationFrames);
+    }
+    fclose(file);
+}
+
+void initLifeEnemy(Enemy *enemy) {
+    enemy->Becker = NULL;
+    LifeEnemy *vida; // Move declaration here to avoid reinitializing inside the loop
+    for (int i = 0; i < 1; i++) {
+        vida = (LifeEnemy *)malloc(sizeof(LifeEnemy));
+        vida->id = i + 1;               
+        vida->prox = enemy->Becker;    
+        enemy->Becker = vida;          
+    }
+}
+
+void addEnemyDoubleLinkedList(DoubleLinkedListEnemy **head, Enemy *newEnemy, int enemyId) {
+    DoubleLinkedListEnemy *newNode = (DoubleLinkedListEnemy *)malloc(sizeof(DoubleLinkedListEnemy));
+    if (newNode == NULL) {
+        fprintf(stderr, "Erro ao alocar memória para o novo inimigo.\n");
+        return;
     }
 
-    int frameCount = 2; // Número de frames para a animação de idle
-    enemy->animationFrames = malloc(sizeof(SDL_Texture*) * frameCount);
+    newNode->id = enemyId;
+    newNode->enemy = newEnemy;
+    newNode->prox = NULL;
+
+    if (*head == NULL) {
+        newNode->ant = NULL;  
+        *head = newNode;      
+        return;
+    }
+
+    DoubleLinkedListEnemy *temp = *head;
+    while (temp->prox != NULL) {
+        temp = temp->prox;
+    }
+
+    temp->prox = newNode;
+    newNode->ant = temp;
+    return;
+}
+
+void updateEnemy(Enemy *enemy, double gravity, double deltaTime, Player *player, SDL_Renderer *renderer) {
+    enemy->position.velY += gravity * deltaTime;
+
+    if (enemy->position.velY > 120) {
+        enemy->position.velY = 120;
+    }
+
+    if (enemy->position.velX > 150) {
+        enemy->position.velX = 150;
+    }
+
+    if (enemy->position.velX < -150) {
+        enemy->position.velX = -150;
+    }
+
+    enemy->position.x += (enemy->position.velX * deltaTime);
+    enemy->position.y += (enemy->position.velY * deltaTime);
+
+    if (checkPlayerEnemyColision(player, enemy)) {
+        damageEnemy(enemy);
+        killEnemyIfDead(enemy);
+    }
+
+    if (checkEnemyBlockCollision(enemy)) {
+        enemy->position.velY = 0; 
+        enemy->position.onGround = true;
+    }
+
+    if (enemy->position.velX > 0) {
+        enemy->currentFrame = (enemy->currentFrame + 1) % enemy->totalFrames;
+        freeEnemyAnimationFrames(enemy);
+        loadEnemyAnimationFrames(enemy, ENEMY_MOVE_RIGHT, renderer);
+    } else {
+        enemy->currentFrame = (enemy->currentFrame + 1) % enemy->totalFrames;
+        freeEnemyAnimationFrames(enemy);
+        loadEnemyAnimationFrames(enemy, ENEMY_MOVE_LEFT, renderer);
+    }
+}
+
+bool loadEnemyAnimationFrames(Enemy *enemy, EnemyAction action, SDL_Renderer *renderer) {
+    int frameCount = 0;
+    switch (action) {
+        case ENEMY_MOVE_LEFT:
+        case ENEMY_MOVE_RIGHT: frameCount = 2; break;
+        default: break;
+    }
+
+    enemy->animationEnemyFrames = malloc(sizeof(SDL_Texture*) * frameCount);
     enemy->totalFrames = frameCount;
 
     for (int i = 0; i < frameCount; i++) {
         char filename[100];
-        snprintf(filename, sizeof(filename), "./project/assets/MovEnemy/enemy_idle_%d.png", i);
-
+        if (action == ENEMY_MOVE_LEFT) {
+            sprintf(filename, "project/assets/MovEnemy/enemy_left_%d.png", i);
+        } else if (action == ENEMY_MOVE_RIGHT) {
+            sprintf(filename, "project/assets/MovEnemy/enemy_right_%d.png", i);
+        }
+        
         SDL_Surface *surface = IMG_Load(filename);
         if (surface == NULL) {
-            printf("Failed to load image: %s\n", filename);
-            enemy->animationFrames[i] = NULL; // Marque como NULL para indicar erro
+            printf("Falha ao carregar a imagem: %s\n", IMG_GetError());
+            enemy->animationEnemyFrames[i] = NULL;
         } else {
-            enemy->animationFrames[i] = SDL_CreateTextureFromSurface(renderer, surface);
+            enemy->animationEnemyFrames[i] = SDL_CreateTextureFromSurface(renderer, surface);
             SDL_FreeSurface(surface);
-
-            if (enemy->animationFrames[i] == NULL) {
-                printf("Failed to create texture from surface for %s\n", filename);
-            }
         }
     }
+    return true; // Added return statement
 }
 
-void updateEnemy(Enemy *enemy, double deltaTime) {
-    if (enemy->isActive) {
-        // Atualiza a posição do inimigo com base na sua velocidade e deltaTime
-        enemy->x += enemy->speedX * deltaTime;
-        enemy->y += enemy->speedY * deltaTime;
-
-        // Lógica para manter o inimigo dentro dos limites da tela
-        if (enemy->x < 0) {
-            enemy->x = 0;
-            enemy->speedX = -enemy->speedX; // Inverte a velocidade ao colidir com a borda esquerda
-        } else if (enemy->x + 64 > SCREEN_WIDTH) {
-            enemy->x = SCREEN_WIDTH - 64;
-            enemy->speedX = -enemy->speedX; // Inverte a velocidade ao colidir com a borda direita
-        }
-
-        if (enemy->y < 0) {
-            enemy->y = 0;
-            enemy->speedY = -enemy->speedY; // Inverte a velocidade ao colidir com a borda superior
-        } else if (enemy->y + 64 > SCREEN_HEIGHT) {
-            enemy->y = SCREEN_HEIGHT - 64;
-            enemy->speedY = -enemy->speedY; // Inverte a velocidade ao colidir com a borda inferior
-        }
-
-        // Atualiza a animação do inimigo
-        enemy->animationTime += deltaTime;
-        if (enemy->animationTime >= 0.1) { // Alterna a cada 0.1 segundos
-            enemy->currentFrame = (enemy->currentFrame + 1) % enemy->totalFrames;
-            enemy->animationTime = 0.0;
-        }
-    }
-}
-
-
-void deactivateEnemy(Enemy *enemy) {
-    enemy->isActive = false;
-}
-
-void damageEnemy(Enemy *enemy, int damage) {
-    if (enemy->isActive) {
-        enemy->health -= damage;
-        if (enemy->health <= 0) {
-            deactivateEnemy(enemy);
-        }
-    }
-}
-
-void freeEnemyAnimations(Enemy *enemy) {
-    if (enemy->animationFrames != NULL) {
+void freeEnemyAnimationFrames(Enemy *enemy) {
+    if (enemy->animationEnemyFrames != NULL) { // Check if animationFrames is not NULL
         for (int i = 0; i < enemy->totalFrames; i++) {
-            if (enemy->animationFrames[i] != NULL) {
-                SDL_DestroyTexture(enemy->animationFrames[i]);
+            if (enemy->animationEnemyFrames[i] != NULL) {
+                SDL_DestroyTexture(enemy->animationEnemyFrames[i]);
             }
         }
-        free(enemy->animationFrames);
-        enemy->animationFrames = NULL;
+        free(enemy->animationEnemyFrames);
+        enemy->animationEnemyFrames = NULL;
     }
+}
+
+void damageEnemy(Enemy *enemy) {
+    if (enemy->Becker != NULL) { // Check if Becker is not NULL
+        LifeEnemy *temp = enemy->Becker;
+        enemy->Becker = enemy->Becker->prox;
+        free(temp);
+    }
+}
+
+bool checkEnemyCollision(SDL_Rect a, SDL_Rect b) {
+    return !(a.x + a.w <= b.x || a.x >= b.x + b.w || a.y + a.h <= b.y || a.y >= b.y + b.h);
+}
+
+bool checkPlayerEnemyColision(Player *player, Enemy *enemy) {
+    SDL_Rect playerRect = { 
+        (int)(player->position.x * escala), 
+        (int)(player->position.y * escala), 
+        (int)(player->width * escala), 
+        (int)(player->height * escala) 
+    };
+
+    SDL_Rect enemyRect = { 
+        (int)(enemy->position.x * escala), 
+        (int)(enemy->position.y * escala), 
+        (int)(enemy->width * escala), 
+        (int)(enemy->height * escala) 
+    };
+
+    if (checkEnemyCollision(playerRect, enemyRect)) {
+        if (playerRect.y + playerRect.h <= enemyRect.y + 5 && player->position.velY >= 0) {
+            damageEnemy(enemy);
+            return false;
+        } else if (playerRect.x + playerRect.w > enemyRect.x && playerRect.x < enemyRect.x) {
+            damagePlayer(player);
+            player->position.x -= 7;
+            return true;
+        } else if (playerRect.x < enemyRect.x + enemyRect.w && playerRect.x > enemyRect.x) {
+            damagePlayer(player);
+            player->position.x += 7;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool enemyHasLife(Enemy *enemy) {
+    return enemy->Becker != NULL;
+}
+
+void killEnemyIfDead(Enemy *enemy) {
+    if (!enemyHasLife(enemy)) {
+        printf("O inimigo foi derrotado!\n");
+        LifeEnemy *currentLife = enemy->Becker;
+        while (currentLife != NULL) {
+            LifeEnemy *temp = currentLife;
+            currentLife = currentLife->prox;
+            free(temp);
+        }
+        freeEnemyAnimationFrames(enemy);
+        enemy->Becker = NULL;
+    }
+    return;
 }

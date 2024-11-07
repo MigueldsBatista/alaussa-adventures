@@ -3,12 +3,16 @@
 
 #include <SDL2/SDL.h>
 #include "player.h"
+#include "enemy.h"
+
 #define MAX_MAP_WIDTH 100
 #define MAX_MAP_HEIGHT 100
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
 #define GROUND_LEVEL (SCREEN_HEIGHT - 50) // Altura do chão a 50 pixels do fundo
+
+
 /**
  * @brief Represents a block in the game map.
  * 
@@ -29,6 +33,8 @@ typedef struct {
  * @param map_file The path to the map file to be loaded.
  */
 void loadMap(const char* map_file);
+
+void updateCameraPosition(Player *player);
 
 /**
  * @brief Renders the map on the screen.
@@ -55,5 +61,7 @@ void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camer
 bool checkCollision(SDL_Rect a, SDL_Rect b);
 
 bool checkPlayerBlockCollision(Player *player);
+
+bool checkEnemyBlockCollision(Enemy *enemy);
 
 #endif // !__MAP_H__

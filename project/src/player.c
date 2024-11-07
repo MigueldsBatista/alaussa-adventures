@@ -23,8 +23,28 @@ void initPlayer(Player *player, SDL_Renderer *renderer) {
     player->height = 64;
     player->currentFrame = 0;
     player->animationFrames = NULL; // Inicializa o ponteiro como NULL
+    initLifePlayer(player);
     loadAnimationFrames(player, PLAYER_IDLE, renderer);
 }
+
+void initLifePlayer(Player *player) {
+    Life *vida;
+    player->Becker = NULL;
+    for (int i = 0; i < 3; i++) {
+        vida = (Life *)malloc(sizeof(Life));
+        vida->id = i + 1;               
+        vida->prox = player->Becker;    
+        player->Becker = vida;          
+    }
+}
+
+void damagePlayer(Player *player) {
+    Life *temp = player->Becker;
+    player->Becker = player->Becker->prox;
+    free(temp);
+}
+
+
 
 void updatePlayer(Player *player, double gravity, double deltaTime, SDL_Renderer *renderer) {
     // Aplica a gravidade à velocidade vertical

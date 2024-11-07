@@ -27,6 +27,14 @@ typedef enum {
     PLAYER_FALL_RIGHT,
 } PlayerAction;
 
+
+typedef struct Life{
+    int id;
+    struct Life *prox;
+} Life;
+
+
+
 /**
  * @brief Structure that represents the player.
  * 
@@ -41,6 +49,7 @@ typedef struct {
     int width;
     int height;
     PlayerAction currentAction;
+    Life *Becker; // head da vida do player
 } Player;
 
 /**
@@ -156,5 +165,9 @@ void updatePlayerAnimation(Player *player, PlayerAction action, double deltaTime
  * @param renderer Pointer to the SDL_Renderer for loading textures.
  */
 void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *renderer);
+
+void initLifePlayer(Player *player);
+
+void damagePlayer(Player *player);
 
 #endif // !__PLAYER_H__

@@ -1,118 +1,72 @@
 #ifndef __ENEMY_H__
 #define __ENEMY_H__
-#define MAX_ENEMIES 5
 
-
+#include "map.h"
+#include "player.h"
 #include <stdbool.h>
 #include <SDL2/SDL.h>
-/*
-Funções para o comportamento e animação dos inimigos.
-*/
 
-/**
- * @struct Enemy
- * @brief Represents an enemy entity in the game.
- * 
- * This structure holds the properties of an enemy, including its position,
- * speed, health, activity status, and texture for rendering.
- * 
- * @param x
- * The x-coordinate of the enemy's position.
- * 
- * @param y
- * The y-coordinate of the enemy's position.
- * 
- * @param speedX
- * The speed of the enemy along the x-axis.
- * 
- * @param speedY
- * The speed of the enemy along the y-axis.
- * 
- * @param health
- * The health of the enemy.
- * 
- * @param isActive
- * The activity status of the enemy.
- * 
- * @param texture
- * The SDL texture used for rendering the enemy.
- */
-typedef struct {
+// Estrutura para a posição do inimigo
+typedef struct PositionEnemy {
+    double x, y;       
+    double velX, velY; 
+    bool onGround;     
+} PositionEnemy;
 
-    int x, y;
+// Estrutura para representar a vida do inimigo
+typedef struct LifeEnemy {
+    int id;
+    struct LifeEnemy *prox;
+} LifeEnemy;
 
-    int speedX, speedY;
-
-    int health;
-
-    bool isActive;
-
-    SDL_Texture **animationFrames;
-
-    int totalFrames;
-
-    int currentFrame;
-
-    double animationTime;
-
-} Enemy;
-
+// Ações que o inimigo pode executar
 typedef enum {
-     ENEMY_IDLE, //repouso
-     ENEMY_MOVE_LEFT,
-     ENEMY_MOVE_RIGHT,
+    ENEMY_MOVE_LEFT,
+    ENEMY_MOVE_RIGHT,
 } EnemyAction;
 
-typedef struct {
-    Enemy enemies[MAX_ENEMIES];
-    int currentEnemyIndex;
-    double spawnTimer;
-} EnemyQueue;
+// Estrutura que representa um inimigo
+typedef struct Enemy {
+    PositionEnemy position;
+    int width;
+    int height;
+    LifeEnemy *Becker; 
+    SDL_Texture **animationEnemyFrames;
+    int totalFrames;
+    int currentFrame;
+    EnemyAction currentEnemyAction;
+} Enemy;
 
-/**
- * @brief Initializes the enemy entity.
- *
- * This function sets up the initial state of the enemy, including its
- * position, health, and any other relevant attributes. It should be called
- * before the enemy is used in the game.
- */
-void initEnemy(Enemy *enemy, int x, int y, int speedX, int speedY, int health, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer);
+// Estrutura para uma lista duplamente encadeada de inimigos
+typedef struct DoubleLinkedListEnemy {
+    int id;
+    Enemy *enemy;
+    struct DoubleLinkedListEnemy *prox;
+    struct DoubleLinkedListEnemy *ant;
+} DoubleLinkedListEnemy;
 
-/**
- * @brief Updates the state of the enemy.
- *
- * This function is responsible for updating the enemy's state, which may include
- * position, health, behavior, and other attributes relevant to the game's logic.
- */
-void updateEnemy(Enemy *enemy, double deltaTime);
+// Declarações de funções
+void spawnEnemiesFromMap(const char* map_file, DoubleLinkedListEnemy **enemyList);
 
-/**
- * @brief Renders the enemy on the screen.
- *
- * This function is responsible for drawing the enemy character
- * on the screen. It handles all the necessary graphical operations
- * to ensure the enemy is displayed correctly.
- */
-void renderEnemy(Enemy *enemy, SDL_Renderer *renderer);
+void initLifeEnemy(Enemy *enemy);
 
-void initEnemyStack(Enemy *enemies, int numEnemies, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer);
+void addEnemyDoubleLinkedList(DoubleLinkedListEnemy **head, Enemy *newEnemy, int enemyId);
 
-void loadAnimationsEnemy(Enemy *enemy, SDL_Renderer *renderer);
+void updateEnemy(Enemy *enemy, double gravity, double deltaTime, Player *player, SDL_Renderer *renderer);
 
-void deactivateEnemy(Enemy *enemy);
+bool loadEnemyAnimationFrames(Enemy *enemy, EnemyAction action, SDL_Renderer *renderer);
 
-void damageEnemy(Enemy *enemy, int damage);
+void freeEnemyAnimationFrames(Enemy *enemy);
 
-void freeEnemyAnimations(Enemy *enemy);
+bool checkEnemyCollision(SDL_Rect a, SDL_Rect b);
 
-void initEnemyQueue(EnemyQueue *queue);
+bool checkPlayerEnemyColision(Player *player, Enemy *enemy);
 
-void spawnEnemy(EnemyQueue *queue, int x, int y, int speedX, int speedY, int health, SDL_Texture **animationFrames, int totalFrames, SDL_Renderer *renderer);
+bool enemyHasLife(Enemy *enemy);
 
-void updateEnemyQueue(EnemyQueue *queue, double deltaTime);
+void damageEnemy(Enemy *enemy);
 
-void renderEnemyQueue(EnemyQueue *queue, SDL_Renderer *renderer);
+void killEnemyIfDead(Enemy *enemy);
+
 
 #endif // __ENEMY_H__
-
-
