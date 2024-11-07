@@ -27,16 +27,31 @@ void initPlayer(Player *player, SDL_Renderer *renderer) {
 }
 
 void updatePlayer(Player *player, double gravity, double deltaTime, SDL_Renderer *renderer) {
-        
+    // Aplica a gravidade à velocidade vertical
     player->position.velY += gravity * deltaTime;
 
+    // Limita a velocidade de queda
+    if (player->position.velY > 120) {
+        player->position.velY = 120;
+    }
+
+    if (player->position.velX > 150) {
+        player->position.velX = 150;
+    }
+
+        if (player->position.velX < -150) {
+        player->position.velX = -150;
+    }
+
+
+    // Atualiza a posição do jogador
     player->position.x += (player->position.velX * deltaTime);
     player->position.y += (player->position.velY * deltaTime);
 
     // Verifica a colisão com o bloco e atualiza `onGround`
     if (checkPlayerBlockCollision(player)) {
-        player->position.velY = 0;
-        player->position.onGround = true;
+        player->position.velY = 0; // Reseta a velocidade vertical ao colidir com o bloco
+        player->position.onGround = true; // Define que o jogador está no chão
     }
 
     // Define a animação correta com base no estado e velocidade
@@ -47,19 +62,18 @@ void updatePlayer(Player *player, double gravity, double deltaTime, SDL_Renderer
             loadAnimationFrames(player, PLAYER_IDLE, renderer);
         }
         else if (player->position.velX > 0 && player->position.velY == 0) {
-        // Movimento à direita no chão
-        player->currentFrame = (player->currentFrame + 1) % player->totalFrames;
-        freeAnimationFrames(player);
-        loadAnimationFrames(player, PLAYER_MOVE_RIGHT, renderer);
+            // Movimento à direita no chão
+            player->currentFrame = (player->currentFrame + 1) % player->totalFrames;
+            freeAnimationFrames(player);
+            loadAnimationFrames(player, PLAYER_MOVE_RIGHT, renderer);
         }
-        else if ( player->position.velX < 0 && player->position.velY == 0) {
-        // Movimento à esquerda no chão
-        player->currentFrame = (player->currentFrame + 1) % player->totalFrames;
-        freeAnimationFrames(player);
-        loadAnimationFrames(player, PLAYER_MOVE_LEFT, renderer);
+        else if (player->position.velX < 0 && player->position.velY == 0) {
+            // Movimento à esquerda no chão
+            player->currentFrame = (player->currentFrame + 1) % player->totalFrames;
+            freeAnimationFrames(player);
+            loadAnimationFrames(player, PLAYER_MOVE_LEFT, renderer);
         }
     }
-        
     else if (!player->position.onGround) {
         // Se está no ar, define a animação de pulo
         player->currentFrame = (player->currentFrame + 1) % player->totalFrames;
@@ -156,7 +170,7 @@ void loadAnimationFrames(Player *player, PlayerAction action, SDL_Renderer *rend
 
 void jumpPlayer(Player *player) {
     if (player->position.onGround) {
-        player->position.velY = -225.0;
+        player->position.velY = -450.0;
         player->position.onGround = false;
     }
 }
