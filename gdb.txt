@@ -1,0 +1,37 @@
+Starting program: /home/miguel/JogoAED/jogo 
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[Detaching after vfork from child process 7295]
+[New Thread 0x7fffe53e5640 (LWP 7297)]
+[New Thread 0x7fffdffff640 (LWP 7298)]
+[New Thread 0x7fffdf7fe640 (LWP 7299)]
+[New Thread 0x7fffdeffd640 (LWP 7300)]
+[New Thread 0x7fffde7fc640 (LWP 7301)]
+[New Thread 0x7fffdd2db640 (LWP 7302)]
+[Thread 0x7fffdd2db640 (LWP 7302) exited]
+[New Thread 0x7fffdd2db640 (LWP 7303)]
+[Thread 0x7fffdd2db640 (LWP 7303) exited]
+[New Thread 0x7fffe4151640 (LWP 7304)]
+[New Thread 0x7fffdd2db640 (LWP 7305)]
+[New Thread 0x7fffdc91a640 (LWP 7307)]
+[Thread 0x7fffdc91a640 (LWP 7307) exited]
+[New Thread 0x7fffdc91a640 (LWP 7308)]
+
+Thread 1 "jogo" received signal SIGFPE, Arithmetic exception.
+0x0000555555558698 in updateEnemy ()
+Single stepping until exit from function updateEnemy,
+which has no line number information.
+Couldn't get registers: No such process.
+[Thread 0x7fffdc91a640 (LWP 7308) exited]
+[Thread 0x7fffdd2db640 (LWP 7305) exited]
+[Thread 0x7fffdeffd640 (LWP 7300) exited]
+[Thread 0x7fffdf7fe640 (LWP 7299) exited]
+[Thread 0x7fffe4151640 (LWP 7304) exited]
+[Thread 0x7fffde7fc640 (LWP 7301) exited]
+[Thread 0x7fffdffff640 (LWP 7298) exited]
+[Thread 0x7ffff6110840 (LWP 7289) exited]
+[Thread 0x7fffe53e5640 (LWP 7297) exited]
+[New process 7289]
+
+Program terminated with signal SIGFPE, Arithmetic exception.
+The program no longer exists.

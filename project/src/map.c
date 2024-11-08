@@ -3,8 +3,8 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include "map.h"
-#include "player.h"
-
+#include "entity.h"
+#include "enemy.h"
 
 const float escala = 0.5; // Ajuste conforme a proporção da tela minimizada
 
@@ -53,11 +53,16 @@ void renderMap(SDL_Renderer* renderer, SDL_Texture* bloco_texture) {
             if (tile == 1) { // Supondo que um tile "0" é vazio
                 SDL_Rect dst_rect = { x * 64, y * 64, 64, 64 }; // Define a posição e o tamanho do tile
                 SDL_RenderCopy(renderer, bloco_texture, NULL, &dst_rect);
+                //printf("Bloco renderizado em (%d, %d)\n", x, y);
             }
-        }
+            
+            if(tile == 2){
+                addEnemy(x * 64, y * 64, renderer);
+                gameMap.tiles[y][x] = 0; // Marca o tile como vazio para evitar adição duplicada        }
     }
 }
-
+    }
+}
 
 void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camera_position, int screen_width, int screen_height) {
     //TODO: Implementar a função renderBackground
@@ -90,7 +95,7 @@ bool checkCollision(SDL_Rect a, SDL_Rect b) {
 }
 
 // Função para verificar colisões entre o jogador e blocos
-bool checkPlayerBlockCollision(Player *player) {
+bool checkEntityBlockCollision(Entity *player) {
     SDL_Rect playerRect = { 
         (int)(player->position.x * escala), 
         (int)(player->position.y * escala), 

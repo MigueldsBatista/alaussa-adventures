@@ -2,7 +2,7 @@
 #define __MAP_H__
 
 #include <SDL2/SDL.h>
-#include "player.h"
+#include "entity.h"
 
 #define MAX_MAP_WIDTH 100
 #define MAX_MAP_HEIGHT 100
@@ -33,7 +33,7 @@ typedef struct {
  */
 void loadMap(const char* map_file);
 
-void updateCameraPosition(Player *player);
+void updateCameraPosition(Entity *player);
 
 /**
  * @brief Renders the map on the screen.
@@ -59,6 +59,6 @@ void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camer
 
 bool checkCollision(SDL_Rect a, SDL_Rect b);
 
-bool checkPlayerBlockCollision(Player *player);
+bool checkEntityBlockCollision(Entity *player);
 
 #endif // !__MAP_H__

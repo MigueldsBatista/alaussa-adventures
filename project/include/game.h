@@ -1,7 +1,9 @@
 #ifndef __GAME_H__
 #define __GAME_H__
 #include <SDL2/SDL.h>
-
+#include <stdbool.h>
+#define GRAVIDADE 250.0
+#define DELTA_TIME 0.09
 /**
  * @brief Initializes the game.
  *

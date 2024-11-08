@@ -5,15 +5,16 @@
 #include <SDL2/SDL_ttf.h>
 
 #include "sound.h"
-#include "player.h"
 #include "map.h"
-#include "enemy.h"
+#include "entity.h"
 #include "menu.h"
 #include "game.h"
 #include "sprite.h"
 #include "utils.h"
+#include "enemy.h"  // Inclusão do arquivo de inimigos
 
 int main(int argc, char* argv[]) {
+    // Inicialização do SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("Erro ao inicializar SDL: %s\n", SDL_GetError());
         return 1;
@@ -31,16 +32,16 @@ int main(int argc, char* argv[]) {
         SDL_Quit();
         return 1;
     }
-    
+
     if (!initAudio()) {
         return 1;
     }
 
     SDL_Window* window = SDL_CreateWindow("Jogo com Menu Inicial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    SDL_Texture* bloco_texture = loadTexture("project/assets/blocks/block.png", renderer); // Load block texture
+    SDL_Texture* bloco_texture = loadTexture("project/assets/blocks/block.png", renderer); // Carregar textura do bloco
 
-    // carregar a fonte
+    // Carregar a fonte
     TTF_Font* font = TTF_OpenFont("./project/assets/fontes/Open-Sans.ttf", 24);
     if (!font) {
         printf("Erro ao carregar fonte: %s\n", TTF_GetError());
@@ -53,8 +54,8 @@ int main(int argc, char* argv[]) {
     }
 
     // Botões
-    Botao botaoJogar = {{230, 100, 200, 50}, {0, 255, 0, 255}}; 
-    Botao botaoInstrucoes = {{230, 200, 200, 50}, {255, 255, 0, 255}}; 
+    Botao botaoJogar = {{230, 100, 200, 50}, {0, 255, 0, 255}};
+    Botao botaoInstrucoes = {{230, 200, 200, 50}, {255, 255, 0, 255}};
     Botao botaoSair = {{230, 300, 200, 50}, {255, 0, 0, 255}};
 
     bool noMenu = true;
@@ -90,7 +91,7 @@ int main(int argc, char* argv[]) {
         // Renderização do menu
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Fundo preto
         SDL_RenderClear(renderer);
-        
+
         loadMap("./project/assets/map/map.txt");
         renderizarBotao(renderer, &botaoJogar, font, "Jogar");
         renderizarBotao(renderer, &botaoInstrucoes, font, "Comandos");
@@ -99,13 +100,12 @@ int main(int argc, char* argv[]) {
     }
 
     if (running) {
-        // Inicializa o jogador e entra no loop principal do jogo
-        Player player;
-        DoubleLinkedListEnemy *ListaInimigos = NULL;
-        initPlayer(&player, renderer);
+        // Inicializa o jogador
+        Entity player;
+        initEntity(&player, PLAYER, 50, 50, 3, renderer);
 
-        double gravity = 250.0;
-        double deltaTime = 0.09; // Aproximadamente 60 FPS
+
+
         while (running) {
             SDL_Event event;
             while (SDL_PollEvent(&event)) {
@@ -122,11 +122,13 @@ int main(int argc, char* argv[]) {
                         }
                     }
                 }
-                PlayerAction action = handlePlayerInput(&event, &player);
+
+                Action action = handleEntityInput(&event, &player);
                 printf("Ação do jogador: %d\n", action);
             }
 
-            updatePlayer(&player, gravity, deltaTime, renderer);
+            updateEntity(&player, renderer);
+            updateEnemies(renderer);
 
             // Implementação da lógica do chão e limites da tela
             if (player.position.y + player.height >= GROUND_LEVEL) {
@@ -149,32 +151,26 @@ int main(int argc, char* argv[]) {
             SDL_RenderFillRect(renderer, &groundRect);
 
             renderMap(renderer, bloco_texture);
-            spawnEnemiesFromMap("./project/assets/map/map.txt", &ListaInimigos);
-
-            // Atualização dos inimigos
-            DoubleLinkedListEnemy *currentEnemy = ListaInimigos;
-            while (currentEnemy != NULL) {
-                updateEnemy(currentEnemy->enemy, gravity, deltaTime, &player, renderer);
-                currentEnemy = currentEnemy->prox;
-            }
-
-            currentEnemy = ListaInimigos;
-            while (currentEnemy != NULL) {
-                renderEnemy(currentEnemy->enemy, renderer); // Implemente a função para renderizar o inimigo
-                currentEnemy = currentEnemy->prox;
-            }
 
             // Desenha o jogador
-            renderPlayer(&player, renderer);
+            renderEntity(&player, renderer);
+
+            // Renderiza os inimigos
+            renderEnemies(renderer);
+
             SDL_RenderPresent(renderer);
 
             SDL_Delay(16);
         }
 
+        // Libera recursos do jogador
         for (int i = 0; i < player.totalFrames; i++) {
             SDL_DestroyTexture(player.animationFrames[i]);
         }
         free(player.animationFrames);
+
+        // Libera recursos dos inimigos
+        freeEnemyList();
     }
 
     // Limpeza final

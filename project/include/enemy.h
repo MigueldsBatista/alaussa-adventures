@@ -1,75 +1,23 @@
 #ifndef __ENEMY_H__
 #define __ENEMY_H__
-
-
-#include "player.h"
-#include "map.h"
-#include <stdbool.h>
+#include "entity.h"
 #include <SDL2/SDL.h>
+#include <stdlib.h> 
+#include "entity.h"
+#include "game.h"
+#define MAX_ENEMIES 10
 
-// Estrutura para a posição do inimigo
-typedef struct PositionEnemy {
-    double x, y;       
-    double velX, velY; 
-    bool onGround;     
-} PositionEnemy;
+typedef struct {
+    Entity *enemies[MAX_ENEMIES];
+    int enemyCount;
+} EnemyList;
 
-// Estrutura para representar a vida do inimigo
-typedef struct LifeEnemy {
-    int id;
-    struct LifeEnemy *prox;
-} LifeEnemy;
+extern EnemyList enemyList;
 
-// Ações que o inimigo pode executar
-typedef enum {
-    ENEMY_MOVE_LEFT,
-    ENEMY_MOVE_RIGHT,
-} EnemyAction;
+void initEnemyList(EnemyList *list);
+void addEnemy(int x, int y, SDL_Renderer *renderer);
+void updateEnemies(SDL_Renderer *renderer);
+void renderEnemies(SDL_Renderer *renderer);
+void freeEnemyList();
 
-// Estrutura que representa um inimigo
-typedef struct Enemy {
-    PositionEnemy position;
-    int width;
-    int height;
-    LifeEnemy *Becker; 
-    SDL_Texture **animationEnemyFrames;
-    int totalFrames;
-    int currentFrame;
-    EnemyAction currentEnemyAction;
-} Enemy;
-
-// Estrutura para uma lista duplamente encadeada de inimigos
-typedef struct DoubleLinkedListEnemy {
-    int id;
-    Enemy *enemy;
-    struct DoubleLinkedListEnemy *prox;
-    struct DoubleLinkedListEnemy *ant;
-} DoubleLinkedListEnemy;
-
-// Declarações de funções
-void spawnEnemiesFromMap(const char* map_file, DoubleLinkedListEnemy **enemyList);
-
-void initLifeEnemy(Enemy *enemy);
-
-void addEnemyDoubleLinkedList(DoubleLinkedListEnemy **head, Enemy *newEnemy, int enemyId);
-
-void updateEnemy(Enemy *enemy, double gravity, double deltaTime, Player *player, SDL_Renderer *renderer);
-
-bool loadEnemyAnimationFrames(Enemy *enemy, EnemyAction action, SDL_Renderer *renderer);
-
-void freeEnemyAnimationFrames(Enemy *enemy);
-
-bool checkEnemyCollision(SDL_Rect a, SDL_Rect b);
-
-bool checkPlayerEnemyColision(Player *player, Enemy *enemy);
-
-bool enemyHasLife(Enemy *enemy);
-
-void damageEnemy(Enemy *enemy);
-
-void killEnemyIfDead(Enemy *enemy);
-
-bool checkEnemyBlockCollision(Enemy *enemy);
-
-void renderEnemy(Enemy *enemy, SDL_Renderer *renderer);
-#endif // __ENEMY_H__
+#endif // !__ENEMY_H__
