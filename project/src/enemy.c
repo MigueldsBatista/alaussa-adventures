@@ -52,3 +52,39 @@ void freeEnemyList() {
     }
     enemyList.enemyCount = 0;
 }
+
+void checkPlayerEnemyCollision(Entity *player, EnemyList *enemyList) {
+    SDL_Rect playerRect = {
+        (int)player->position.x,
+        (int)player->position.y,
+        player->width,
+        player->height
+    };
+    
+    for (int i = 0; i < enemyList->enemyCount; i++) {
+        Entity *enemy = enemyList->enemies[i];
+        SDL_Rect enemyRect = {
+            (int)enemy->position.x,
+            (int)enemy->position.y,
+            enemy->width,
+            enemy->height
+        };
+
+        if (checkCollision(playerRect, enemyRect)) {
+
+            // pulou em cima
+            if (playerRect.y + playerRect.h - 5 <= enemyRect.y && player->position.velY > 0) {
+                free(enemyList->enemies[i]); 
+                for (int j = i; j < enemyList->enemyCount - 1; j++) {
+                    enemyList->enemies[j] = enemyList->enemies[j + 1];
+                }
+                enemyList->enemyCount--;
+                player->position.velY = -150;
+            }
+            // bateu do lado
+            else {
+                damageEntity(player);
+            }
+        }
+    }
+}

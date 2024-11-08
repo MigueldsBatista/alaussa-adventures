@@ -19,5 +19,7 @@ void addEnemy(int x, int y, SDL_Renderer *renderer);
 void updateEnemies(SDL_Renderer *renderer);
 void renderEnemies(SDL_Renderer *renderer);
 void freeEnemyList();
+void checkPlayerEnemyCollision(Entity *player, EnemyList *enemyList);
+
 
 #endif // !__ENEMY_H__

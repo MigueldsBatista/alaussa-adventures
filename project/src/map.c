@@ -55,12 +55,14 @@ void renderMap(SDL_Renderer* renderer, SDL_Texture* bloco_texture) {
                 SDL_RenderCopy(renderer, bloco_texture, NULL, &dst_rect);
                 //printf("Bloco renderizado em (%d, %d)\n", x, y);
             }
-            
             if(tile == 2){
                 addEnemy(x * 64, y * 64, renderer);
                 gameMap.tiles[y][x] = 0; // Marca o tile como vazio para evitar adição duplicada        }
-    }
-}
+            }
+            if(tile!=1 && tile!=2){
+                gameMap.tiles[y][x]=0;//esse if é so pra caso a gente bote algum numero que a gente não quer ele só ignora e bota bloco de ar
+            }
+        }
     }
 }
 

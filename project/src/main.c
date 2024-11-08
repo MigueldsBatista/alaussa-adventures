@@ -130,6 +130,9 @@ int main(int argc, char* argv[]) {
             updateEntity(&player, renderer);
             updateEnemies(renderer);
 
+            checkPlayerEnemyCollision(&player, &enemyList);
+
+
             // Implementação da lógica do chão e limites da tela
             if (player.position.y + player.height >= GROUND_LEVEL) {
                 player.position.y = GROUND_LEVEL - player.height;
