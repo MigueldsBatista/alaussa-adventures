@@ -82,14 +82,17 @@ void checkPlayerEnemyCollision(Entity *player, EnemyList *enemyList) {
                 for (int j = i; j < enemyList->enemyCount - 1; j++) {
                     enemyList->enemies[j] = enemyList->enemies[j + 1];
                 }
+                
                 enemyList->enemyCount--;
                 enemyList->enemies[enemyList->enemyCount] = NULL;  // Garante que o último ponteiro seja nulo
                 player->position.velY = -150;  // o pulinho de hurray!!
             }
             // Colisão lateral ou por baixo
-            else {
+            
+            else if(playerRect.x + playerRect.w > enemyRect.x && playerRect.x < enemyRect.x + enemyRect.w){
                 damageEntity(player);
             }
         }
+        
     }
 }

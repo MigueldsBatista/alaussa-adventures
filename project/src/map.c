@@ -116,8 +116,8 @@ bool checkEntityBlockCollision(Entity *player) {
                     (int)(64 * escala), 
                     (int)(64 * escala) 
                 };
-
-                if (checkCollision(playerRect, blockRect)) {
+                
+                if (SDL_HasIntersection(&playerRect, &blockRect)==SDL_TRUE) {
                     // Colisão por cima (o jogador aterrissa no bloco)
                     if (playerRect.y + playerRect.h <= blockRect.y + 5 && player->position.velY >= 0) {
                         player->position.onGround = true;
@@ -135,7 +135,8 @@ bool checkEntityBlockCollision(Entity *player) {
                     else if (playerRect.x + playerRect.w > blockRect.x && playerRect.x < blockRect.x) {
                         player->position.x = blockRect.x / escala - player->width;  // Ajuste suave pela esquerda
                         player->position.velX = 0;  // Zera a velocidade horizontal
-                    } 
+                    }
+
                     else if (playerRect.x < blockRect.x + blockRect.w && playerRect.x > blockRect.x) {
                         player->position.x = (blockRect.x + blockRect.w) / escala;  // Ajuste suave pela direita
                         player->position.velX = 0;  // Zera a velocidade horizontal
@@ -161,6 +162,9 @@ void checkMapTransition(Entity *player, SDL_Renderer *renderer, SDL_Texture *blo
         snprintf(mapFile, sizeof(mapFile), "project/assets/map/map_%d.txt", currentMap); // Formata o nome do mapa anterior
         loadMap(mapFile); // Carrega o mapa anterior
         player->position.x = SCREEN_WIDTH - player->width; // Reseta a posição do jogador para o final do mapa anterior
+        freeEnemyList();
+
     }
+    
     renderMap(renderer, bloco_texture);
 }
