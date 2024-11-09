@@ -72,8 +72,8 @@ void checkPlayerEnemyCollision(Entity *player, EnemyList *enemyList) {
 
         if (checkCollision(playerRect, enemyRect)) {
 
-            // pulou em cima
-            if (playerRect.y + playerRect.h - 5 <= enemyRect.y && player->position.velY > 0) {
+            // jumped on top
+            if (playerRect.y + playerRect.h <= enemyRect.y && player->position.velY > 0) {
                 free(enemyList->enemies[i]); 
                 for (int j = i; j < enemyList->enemyCount - 1; j++) {
                     enemyList->enemies[j] = enemyList->enemies[j + 1];
@@ -81,7 +81,7 @@ void checkPlayerEnemyCollision(Entity *player, EnemyList *enemyList) {
                 enemyList->enemyCount--;
                 player->position.velY = -150;
             }
-            // bateu do lado
+            // hit from the side
             else {
                 damageEntity(player);
             }

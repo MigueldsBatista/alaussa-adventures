@@ -12,6 +12,10 @@
 #include "sprite.h"
 #include "utils.h"
 #include "enemy.h"  // Inclusão do arquivo de inimigos
+#include "player.h" // Inclusão do arquivo de jogador
+
+bool noMenu = true;
+bool running = true;
 
 int main(int argc, char* argv[]) {
     // Inicialização do SDL
@@ -58,8 +62,7 @@ int main(int argc, char* argv[]) {
     Botao botaoInstrucoes = {{230, 200, 200, 50}, {255, 255, 0, 255}};
     Botao botaoSair = {{230, 300, 200, 50}, {255, 0, 0, 255}};
 
-    bool noMenu = true;
-    bool running = true;
+
 
     // Música de fundo
     Mix_Music* bgMusic = loadMusic("./project/assets/musica/musicaAED.mp3");
@@ -129,7 +132,7 @@ int main(int argc, char* argv[]) {
 
             updateEntity(&player, renderer);
             updateEnemies(renderer);
-
+                
             checkPlayerEnemyCollision(&player, &enemyList);
 
 
@@ -160,6 +163,11 @@ int main(int argc, char* argv[]) {
 
             // Renderiza os inimigos
             renderEnemies(renderer);
+            if (!player.isAlive) {
+                showGameOverScreen(renderer, font);
+                running = false;
+            }
+            renderPlayerLife(&player, renderer, font);
 
             SDL_RenderPresent(renderer);
 
@@ -188,3 +196,5 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+
+// Call this function inside the game loop after rendering the player and enemies

@@ -75,3 +75,35 @@ void mostrarInstrucoes(SDL_Renderer *renderer, TTF_Font *font) {
         }
     }
 }
+
+void showGameOverScreen(SDL_Renderer* renderer, TTF_Font* font) {
+    bool gameOver = true;
+    extern bool running;
+    Botao botaoRestart = {{230, 300, 200, 50}, {255, 0, 0, 255}};
+    
+    while (gameOver) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {// Fecha o jogo se clicar no X que é o codigo numero 256
+                gameOver = false;
+                running = false;
+            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                if (pontoDentroDoRetangulo(x, y, &botaoRestart.rect)) {
+                    gameOver = false;  // Restart the game
+                    running = true;
+                }
+            }
+        }
+
+        // Renderização da tela de game over
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Fundo preto
+        SDL_RenderClear(renderer);
+
+        renderizarTexto(renderer, font, "Game Over", (SDL_Color){255, 255, 255, 255}, 250, 100);
+        renderizarBotao(renderer, &botaoRestart, font, "Restart");
+
+        SDL_RenderPresent(renderer);
+    }
+}

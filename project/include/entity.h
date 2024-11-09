@@ -55,6 +55,7 @@ typedef struct {
     Action currentAction;
     Life *head; // head da vida do entity
     Label label;
+    bool isAlive;
 } Entity;
 
 /**

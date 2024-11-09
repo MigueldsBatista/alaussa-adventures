@@ -28,6 +28,7 @@ void initEntity(Entity *entity, Label label, int posX, int posY, int life_quanti
     entity->currentFrame = 0;
     entity->animationFrames = NULL; // Inicializa o ponteiro como NULL
     entity->label = label;
+    entity->isAlive = true;
     initLifeEntity(entity, life_quantity);
     loadAnimationFrames(entity, IDLE, renderer);
 }
@@ -45,6 +46,11 @@ void initLifeEntity(Entity *entity, int life_quantity) {
 
 void damageEntity(Entity *entity) {
     Life *temp = entity->head;
+    if(entity->head->prox == NULL){
+        printf("Player morreu\n");
+        entity->isAlive = false;
+        return;
+    }
     entity->head = entity->head->prox;
     free(temp);
 }
@@ -156,15 +162,19 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) 
     int frameCount = 0;
     
     // Determina o número de frames com base na ação
-    switch (action) {
-        case IDLE: frameCount = 1; break;
-        case MOVE_LEFT:
-        case MOVE_RIGHT: frameCount = 3; break;
-        case JUMP_RIGHT:
-        case JUMP_LEFT:
-        case FALL_LEFT:
-        case FALL_RIGHT: frameCount = 3; break;
-        default: break;
+    if (entity->isAlive == false) {
+        frameCount = 1;
+    } else {
+        switch (action) {
+            case IDLE: frameCount = 1; break;
+            case MOVE_LEFT:
+            case MOVE_RIGHT: frameCount = 3; break;
+            case JUMP_RIGHT:
+            case JUMP_LEFT:
+            case FALL_LEFT:
+            case FALL_RIGHT: frameCount = 3; break;
+            default: break;
+        }
     }
 
     // Aloca memória para as texturas de animação
@@ -200,7 +210,9 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) 
                 sprintf(filename, "project/assets/MovEnemy/enemy_idle_%d.png", i);
             }
         }
-
+        else if(entity->isAlive == false){
+            sprintf(filename, "project/assets/MovPlayer/player_gameover_%d.png", i);
+        }
         // Carrega a imagem da textura
         surface = IMG_Load(filename);
         if (surface == NULL) {

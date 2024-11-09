@@ -17,4 +17,6 @@ void renderizarBotao(SDL_Renderer *renderer, Botao *botao, TTF_Font *font, const
 
 void mostrarInstrucoes(SDL_Renderer *renderer, TTF_Font *font);
 
+void showGameOverScreen(SDL_Renderer *renderer, TTF_Font *font);
+
 #endif
