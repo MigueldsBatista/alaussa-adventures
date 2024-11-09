@@ -45,15 +45,24 @@ void initLifeEntity(Entity *entity, int life_quantity) {
 }
 
 void damageEntity(Entity *entity) {
+    // Se o jogador já está imune, não faz nada
+    if (entity->imortalidadeAtiva) {
+        return;
+    }
+    // Retira uma vida
     Life *temp = entity->head;
-    if(entity->head->prox == NULL){
+    if (entity->head->prox == NULL) {
         printf("Player morreu\n");
         entity->isAlive = false;
         return;
     }
     entity->head = entity->head->prox;
     free(temp);
+    // Ativa a imortalidade
+    entity->imortalidadeAtiva = true;
+    entity->imortalidadeTimer = 2.0f;  // 2 segundos de imortalidade (ajuste conforme necessário)
 }
+
 
 
 void updateEntity(Entity *entity, SDL_Renderer *renderer) {
@@ -237,4 +246,13 @@ void moveLeft(Entity *entity) {
 
 void moveRight(Entity *entity) {
     entity->position.velX = 100.0;
+}
+
+void atualizarImortalidade(Entity *entity, float deltaTime) {
+    if (entity->imortalidadeAtiva) {
+        entity->imortalidadeTimer -= deltaTime;  // Diminui o temporizador
+        if (entity->imortalidadeTimer <= 0) {
+            entity->imortalidadeAtiva = false;  // Desativa a imortalidade
+        }
+    }
 }
