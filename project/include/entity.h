@@ -56,6 +56,8 @@ typedef struct {
     Life *head; // head da vida do entity
     Label label;
     bool isAlive;
+    bool imortalidadeAtiva;
+    float imortalidadeTimer;
 } Entity;
 
 /**
@@ -176,5 +178,8 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer);
 void initLifeEntity(Entity *entity, int life_quantity);
 
 void damageEntity(Entity *entity);
+
+void atualizarImortalidade(Entity *entity, float deltaTime);
+
 
 #endif // !__ENTITY_H__

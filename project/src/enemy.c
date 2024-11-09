@@ -71,19 +71,22 @@ void checkPlayerEnemyCollision(Entity *player, EnemyList *enemyList) {
             enemy->width,
             enemy->height
         };
-
         if (checkCollision(playerRect, enemyRect)) {
-
-            // jumped on top
-            if (playerRect.y + playerRect.h <= enemyRect.y && player->position.velY > 0) {
-                free(enemyList->enemies[i]); 
+            if (player->imortalidadeAtiva) {
+                return;
+            }
+            // Verifica se o jogador caiu em cima do inimigo
+            if (playerRect.y + playerRect.h >= enemyRect.y && playerRect.y + playerRect.h < enemyRect.y + enemyRect.h / 2 && player->position.velY >= 0) {
+                free(enemyList->enemies[i]);  // Libera a memória do inimigo atual
+                // Remove o inimigo da lista, reorganizando o array
                 for (int j = i; j < enemyList->enemyCount - 1; j++) {
                     enemyList->enemies[j] = enemyList->enemies[j + 1];
                 }
                 enemyList->enemyCount--;
-                player->position.velY = -150;
+                enemyList->enemies[enemyList->enemyCount] = NULL;  // Garante que o último ponteiro seja nulo
+                player->position.velY = -150;  // o pulinho de hurray!!
             }
-            // hit from the side
+            // Colisão lateral ou por baixo
             else {
                 damageEntity(player);
             }

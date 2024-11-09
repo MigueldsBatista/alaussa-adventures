@@ -18,6 +18,9 @@ bool noMenu = true;
 bool running = true;
 
 int main(int argc, char* argv[]) {
+
+    Uint32 lastTime = SDL_GetTicks();
+    
     // Inicialização do SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("Erro ao inicializar SDL: %s\n", SDL_GetError());
@@ -111,57 +114,72 @@ int main(int argc, char* argv[]) {
 
 
         while (running) {
+            Uint32 currentTime = SDL_GetTicks();  
+            float deltaTime = (currentTime - lastTime) / 1000.0f; 
+            lastTime = currentTime;
+
             SDL_Event event;
             while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_QUIT) {
-                    running = false;
-                } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
-                    printf("Jogo pausado. Pressione P para despausar.\n");
-                    bool paused = true;
-                    while (paused) {
-                        while (SDL_PollEvent(&event)) {
-                            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
-                                paused = false;
+                    if (event.type == SDL_QUIT) {
+                        running = false;
+                    } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
+                        printf("Jogo pausado. Pressione P para despausar.\n");
+                        bool paused = true;
+                        while (paused) {
+                            while (SDL_PollEvent(&event)) {
+                                if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
+                                    paused = false;
+                                }
                             }
                         }
                     }
+                    Action action = handleEntityInput(&event, &player);
+                    printf("Ação do jogador: %d\n", action);
                 }
 
-                Action action = handleEntityInput(&event, &player);
-                printf("Ação do jogador: %d\n", action);
-            }
+                // Atualiza o jogador e os inimigos
+                updateEntity(&player, renderer);
+                updateEnemies(renderer);
 
-            updateEntity(&player, renderer);
-            updateEnemies(renderer);
-                
-            checkPlayerEnemyCollision(&player, &enemyList);
+                // Atualiza o temporizador de imortalidade
+                atualizarImortalidade(&player, deltaTime);  // Atualiza a imortalidade do jogador
 
+                checkPlayerEnemyCollision(&player, &enemyList);
 
-            // Implementação da lógica do chão e limites da tela
-            if (player.position.y + player.height >= GROUND_LEVEL) {
-                player.position.y = GROUND_LEVEL - player.height;
-                player.position.velY = 0;
-                player.position.onGround = true;
-            }
+                // Implementação da lógica do chão e limites da tela
+                if (player.position.y + player.height >= GROUND_LEVEL) {
+                    player.position.y = GROUND_LEVEL - player.height;
+                    player.position.velY = 0;
+                    player.position.onGround = true;
+                }
 
-            if (player.position.x < 0) {
-                player.position.x = 0;
-            } else if (player.position.x + player.width > SCREEN_WIDTH) {
-                player.position.x = SCREEN_WIDTH - player.width;
-            }
+                if (player.position.x < 0) {
+                    player.position.x = 0;
+                } else if (player.position.x + player.width > SCREEN_WIDTH) {
+                    player.position.x = SCREEN_WIDTH - player.width;
+                }
 
-            SDL_RenderClear(renderer);
+                SDL_RenderClear(renderer);
 
-            // Desenha o chão
-            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-            SDL_Rect groundRect = {0, GROUND_LEVEL, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_LEVEL};
-            SDL_RenderFillRect(renderer, &groundRect);
+                // Desenha o chão
+                SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                SDL_Rect groundRect = {0, GROUND_LEVEL, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_LEVEL};
+                SDL_RenderFillRect(renderer, &groundRect);
 
-            renderMap(renderer, bloco_texture);
+                renderMap(renderer, bloco_texture);
 
-            // Desenha o jogador
-            renderEntity(&player, renderer);
+                // Desenha o jogador
+                renderEntity(&player, renderer);
 
+                // Renderiza os inimigos
+                renderEnemies(renderer);
+                if (!player.isAlive) {
+                    showGameOverScreen(renderer, font);
+                    running = false;
+                }
+                renderPlayerLife(&player, renderer, font);
+
+                SDL_RenderPresent(renderer);
             // Renderiza os inimigos
             renderEnemies(renderer);
             if (!player.isAlive) {
@@ -172,19 +190,16 @@ int main(int argc, char* argv[]) {
             checkMapTransition(&player, renderer, bloco_texture);
             SDL_RenderPresent(renderer);
 
-            SDL_Delay(16);
-        }
-
+                SDL_Delay(16);  // Delay para controlar o FPS
+            }           
         // Libera recursos do jogador
         for (int i = 0; i < player.totalFrames; i++) {
             SDL_DestroyTexture(player.animationFrames[i]);
         }
         free(player.animationFrames);
-
         // Libera recursos dos inimigos
         freeEnemyList();
     }
-
     // Limpeza final
     freeMusic(bgMusic);
     closeAudio();
