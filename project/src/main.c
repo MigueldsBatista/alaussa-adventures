@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) {
             checkMapTransition(&player, renderer, bloco_texture);
             SDL_RenderPresent(renderer);
 
-                SDL_Delay(16);  // Delay para controlar o FPS
+            SDL_Delay(16);  // Delay para controlar o FPS
             }           
         // Libera recursos do jogador
         for (int i = 0; i < player.totalFrames; i++) {

@@ -21,5 +21,10 @@ void renderEnemies(SDL_Renderer *renderer);
 void freeEnemyList();
 void checkPlayerEnemyCollision(Entity *player, EnemyList *enemyList);
 
+void moveEnemyLeft(Entity *entity);
+void moveEnemyRight(Entity *entity);
+
+bool checkEntityBlockCollision(Entity *enemy);
+
 
 #endif // !__ENEMY_H__
