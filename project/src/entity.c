@@ -17,7 +17,21 @@ void freeAnimationFrames(Entity *entity) {
     entity->animationFrames = NULL;
 }
 
-void initEntity(Entity *entity, Label label, int posX, int posY, int life_quantity, SDL_Renderer *renderer) {
+void initEnemy(Entity *entity, Label label, int posX, int posY, int life_quantity, SDL_Renderer *renderer) {
+    entity->position.x = posX;
+    entity->position.y = posY;
+    entity->position.velX = 0.0;
+    entity->position.velY = 0.0;
+    entity->position.onGround = true;
+    entity->width = 64;
+    entity->height = 64;
+    entity->currentFrame = 0;
+    entity->animationFrames = NULL; // Inicializa o ponteiro como NULL
+    entity->label = label;
+    initLifeEntity(entity, life_quantity);
+    loadAnimationFrames(entity, IDLE, renderer);
+}
+void initPlayer(Entity *entity, Label label, int posX, int posY, int life_quantity, SDL_Renderer *renderer) {
     entity->position.x = posX;
     entity->position.y = posY;
     entity->position.velX = 0.0;
@@ -29,6 +43,7 @@ void initEntity(Entity *entity, Label label, int posX, int posY, int life_quanti
     entity->animationFrames = NULL; // Inicializa o ponteiro como NULL
     entity->label = label;
     entity->isAlive = true;
+    entity->moedas=0;
     initLifeEntity(entity, life_quantity);
     loadAnimationFrames(entity, IDLE, renderer);
 }

@@ -59,8 +59,12 @@
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
+    "*.h": "c",
+    "*.asm": "mips",
+    "*.html": "html",
     "player.h": "c",
     "stdio.h": "c",
-    "sdl_image.h": "c"
+    "sdl_image.h": "c",
+    "random": "c"
   }
 }

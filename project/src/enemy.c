@@ -18,7 +18,7 @@ void addEnemy(int x, int y, SDL_Renderer *renderer) {
     if (enemyList.enemyCount < MAX_ENEMIES) {
         Entity *enemy = (Entity *)malloc(sizeof(Entity));
         if (enemy) {
-            initEntity(enemy, ENEMY, x, y, 3, renderer);
+            initEnemy(enemy, ENEMY, x, y, 3, renderer);
             enemyList.enemies[enemyList.enemyCount++] = enemy;
             printf("Inimigo adicionado em (%d, %d)\n", x, y);
         } else {
@@ -96,7 +96,7 @@ void checkPlayerEnemyCollision(Entity *player, EnemyList *enemyList) {
             enemy->width,
             enemy->height
         };
-        if (checkCollision(playerRect, enemyRect)) {
+        if (SDL_HasIntersection(&playerRect, &enemyRect)) {
             if (player->imortalidadeAtiva) {
                 return;
             }
@@ -107,7 +107,7 @@ void checkPlayerEnemyCollision(Entity *player, EnemyList *enemyList) {
                 for (int j = i; j < enemyList->enemyCount - 1; j++) {
                     enemyList->enemies[j] = enemyList->enemies[j + 1];
                 }
-                
+
                 enemyList->enemyCount--;
                 enemyList->enemies[enemyList->enemyCount] = NULL;  // Garante que o último ponteiro seja nulo
                 player->position.velY = -150;  // o pulinho de hurray!!

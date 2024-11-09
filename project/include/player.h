@@ -5,5 +5,6 @@
 #include <SDL2/SDL_ttf.h>
 
 void renderPlayerLife(Entity *player, SDL_Renderer *renderer, TTF_Font *font);
+void renderPlayerCoins(Entity *player, SDL_Renderer *renderer, TTF_Font *font);
 
 #endif // !__PLAYER_H
