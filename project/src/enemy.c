@@ -6,6 +6,14 @@
 #include "map.h"
 EnemyList enemyList = { .enemyCount = 0 };
 
+void moveEnemyLeft(Entity *entity) {
+    entity->position.velX = -25.0;
+}
+
+void moveEnemyRight(Entity *entity) {
+    entity->position.velX = 25.0;
+}
+
 void addEnemy(int x, int y, SDL_Renderer *renderer) {
     if (enemyList.enemyCount < MAX_ENEMIES) {
         Entity *enemy = (Entity *)malloc(sizeof(Entity));
@@ -31,18 +39,35 @@ void renderEnemies(SDL_Renderer *renderer) {
 void updateEnemies(SDL_Renderer *renderer) {
     for (int i = 0; i < enemyList.enemyCount; i++) {
         Entity *enemy = enemyList.enemies[i];
-        if(enemy->position.y + enemy->height >= GROUND_LEVEL){
+        enemy->position.velY += GRAVIDADE * DELTA_TIME;
+        if (enemy->position.velY > 100) {
+            enemy->position.velY = 100;
+        }
+        if (enemy->position.y + enemy->height >= GROUND_LEVEL) {
             enemy->position.y = GROUND_LEVEL - enemy->height;
             enemy->position.velY = 0;
             enemy->position.onGround = true;
-            moveRight(enemy);
         }
-        else if (enemy->position.x + enemy->width > SCREEN_WIDTH) {
-            enemy->position.x = SCREEN_WIDTH - enemy->width;    
-            moveLeft(enemy);    
-        }  
+        // ↑ esse codigo de cima é pra caso o inimigo esteja fora do chão aplicar a gravidade e essas coisas
+        // Movimento
+        if (enemy->position.onGround) {
+            if (enemy->position.velX == 0) {
+                moveEnemyLeft(enemy);
+            }
+            if (checkEntityBlockCollision(enemy)) {
+                if (enemy->position.velX > 0) {
+                    moveEnemyLeft(enemy);
+                } else {
+                    moveEnemyRight(enemy);
+                }
+            }
+        }
+        // Atualiza a posição horizontal do inimigo
+        enemy->position.x += enemy->position.velX * DELTA_TIME;
+        // Atualiza (queda)
+        enemy->position.y += enemy->position.velY * DELTA_TIME;
+        // Renderiza o inimigo
         updateEntity(enemy, renderer);
-    
     }
 }
 
