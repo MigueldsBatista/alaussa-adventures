@@ -46,7 +46,6 @@ int main(int argc, char* argv[]) {
 
     SDL_Window* window = SDL_CreateWindow("Jogo com Menu Inicial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    SDL_Texture* bloco_texture = loadTexture("project/assets/blocks/block.png", renderer); // Carregar textura do bloco
 
     // Carregar a fonte
     TTF_Font* font = TTF_OpenFont("./project/assets/fontes/Open-Sans.ttf", 24);
@@ -109,8 +108,7 @@ int main(int argc, char* argv[]) {
     if (running) {
         // Inicializa o jogador
         Entity player;
-        initEntity(&player, PLAYER, 50, 50, 3, renderer);
-
+        initPlayer(&player, PLAYER, 50, 50, 3, renderer);
 
 
         while (running) {
@@ -166,7 +164,7 @@ int main(int argc, char* argv[]) {
                 SDL_Rect groundRect = {0, GROUND_LEVEL, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_LEVEL};
                 SDL_RenderFillRect(renderer, &groundRect);
 
-                renderMap(renderer, bloco_texture);
+                renderMap(renderer);
 
                 // Desenha o jogador
                 renderEntity(&player, renderer);
@@ -178,7 +176,7 @@ int main(int argc, char* argv[]) {
                     running = false;
                 }
                 renderPlayerLife(&player, renderer, font);
-
+                renderPlayerCoins(&player, renderer, font);
                 SDL_RenderPresent(renderer);
             // Renderiza os inimigos
             renderEnemies(renderer);
@@ -186,12 +184,13 @@ int main(int argc, char* argv[]) {
                 showGameOverScreen(renderer, font);
                 running = false;
             }
+            
             renderPlayerLife(&player, renderer, font);
-            checkMapTransition(&player, renderer, bloco_texture);
+            checkMapTransition(&player, renderer);
             SDL_RenderPresent(renderer);
 
-                SDL_Delay(16);  // Delay para controlar o FPS
-            }           
+                SDL_Delay(16);// Delay para controlar o FPS
+            }
         // Libera recursos do jogador
         for (int i = 0; i < player.totalFrames; i++) {
             SDL_DestroyTexture(player.animationFrames[i]);

@@ -42,7 +42,7 @@ void updateCameraPosition(Entity *player);
  * all the necessary operations to display the current state of the map
  * to the player.
  */
-void renderMap(SDL_Renderer* renderer, SDL_Texture* bloco_texture);
+void renderMap(SDL_Renderer* renderer);
 
 /**
  * @brief Renders the background texture onto the screen.
@@ -57,9 +57,8 @@ void renderMap(SDL_Renderer* renderer, SDL_Texture* bloco_texture);
  */
 void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camera_position, int screen_width, int screen_height);
 
-bool checkCollision(SDL_Rect a, SDL_Rect b);
 
 bool checkEntityBlockCollision(Entity *player);
-void checkMapTransition(Entity *player, SDL_Renderer *renderer, SDL_Texture *bloco_texture);
+void checkMapTransition(Entity *player, SDL_Renderer *renderer);
 
 #endif // !__MAP_H__

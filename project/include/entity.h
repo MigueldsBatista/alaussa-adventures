@@ -58,6 +58,7 @@ typedef struct {
     bool isAlive;
     bool imortalidadeAtiva;
     float imortalidadeTimer;
+    int moedas;
 } Entity;
 
 /**
@@ -69,7 +70,8 @@ typedef struct {
  * @param entity Pointer to the Entity structure to initialize.
  */
 
-void initEntity(Entity *entity, Label label, int posX, int posY, int life_quantity, SDL_Renderer *renderer);
+void initPlayer(Entity *entity, Label label, int posX, int posY, int life_quantity, SDL_Renderer *renderer);
+void initEnemy(Entity *entity, Label label, int posX, int posY, int life_quantity, SDL_Renderer *renderer);
 
 /**
  * @brief Updates the entity's state.

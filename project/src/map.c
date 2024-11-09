@@ -5,7 +5,7 @@
 #include "map.h"
 #include "entity.h"
 #include "enemy.h"
-
+#include "sprite.h"
 const float escala = 0.5; // Ajuste conforme a proporção da tela minimizada
 
 
@@ -45,13 +45,17 @@ void loadMap(const char* map_file) {
 
 // The first line contains the width and height of the map.
 // The following lines contain the tile values for each row of the map.
-void renderMap(SDL_Renderer* renderer, SDL_Texture* bloco_texture) {
+void renderMap(SDL_Renderer* renderer) {
+    SDL_Texture* bloco_texture = loadTexture("project/assets/blocks/block.png", renderer);
+    SDL_Texture *coin_texture = loadTexture("project/assets/blocks/coin.png", renderer);
+
     //TODO: Implementar a função renderMap
     for (int y = 0; y < gameMap.height; y++) {
         for (int x = 0; x < gameMap.width; x++) {
             int tile = gameMap.tiles[y][x];
+            SDL_Rect dst_rect = { x * 64, y * 64, 64, 64 }; // Define a posição e o tamanho do tile
+
             if (tile == 1) { // Supondo que um tile "0" é vazio
-                SDL_Rect dst_rect = { x * 64, y * 64, 64, 64 }; // Define a posição e o tamanho do tile
                 SDL_RenderCopy(renderer, bloco_texture, NULL, &dst_rect);
                 //printf("Bloco renderizado em (%d, %d)\n", x, y);
             }
@@ -59,8 +63,11 @@ void renderMap(SDL_Renderer* renderer, SDL_Texture* bloco_texture) {
                 addEnemy(x * 64, y * 64, renderer);
                 gameMap.tiles[y][x] = 0; // Marca o tile como vazio para evitar adição duplicada        }
             }
-            if(tile!=1 && tile!=2){
-                gameMap.tiles[y][x]=0;//esse if é so pra caso a gente bote algum numero que a gente não quer ele só ignora e bota bloco de ar
+
+            if(tile==3){
+                gameMap.tiles[y][x]=0;
+                SDL_RenderCopy(renderer, coin_texture, NULL, &dst_rect);
+
             }
         }
     }
@@ -87,14 +94,6 @@ void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camer
     }
 }
 
-// Function to check for collision between two rectangles
-bool checkCollision(SDL_Rect a, SDL_Rect b) {
-    // Check if the rectangles overlap
-    if (a.x + a.w <= b.x || a.x >= b.x + b.w || a.y + a.h <= b.y || a.y >= b.y + b.h) {
-        return false;
-    }
-    return true;
-}
 
 // Função para verificar colisões entre o jogador e blocos
 bool checkEntityBlockCollision(Entity *player) {
@@ -148,7 +147,7 @@ bool checkEntityBlockCollision(Entity *player) {
     return false;
 }
 
-void checkMapTransition(Entity *player, SDL_Renderer *renderer, SDL_Texture *bloco_texture) {
+void checkMapTransition(Entity *player, SDL_Renderer *renderer) {
     static int currentMap = 0;
     char mapFile[256];
 
@@ -163,8 +162,33 @@ void checkMapTransition(Entity *player, SDL_Renderer *renderer, SDL_Texture *blo
         loadMap(mapFile); // Carrega o mapa anterior
         player->position.x = SCREEN_WIDTH - player->width; // Reseta a posição do jogador para o final do mapa anterior
         freeEnemyList();
-
     }
+
+    renderMap(renderer);
+}
+
+void checkCoinCollected(Entity*player, SDL_Renderer *renderer, SDL_Texture *block_texture){
+    SDL_Rect playerRect = {
+        (int)player->position.x,
+        (int)player->position.y,
+        player->width,
+        player->height
+    };
     
-    renderMap(renderer, bloco_texture);
+    for (int y = 0; y < gameMap.height; y++) {
+        for (int x = 0; x < gameMap.width; x++) {
+            if (gameMap.tiles[y][x] == 3) {
+                SDL_Rect coinRect = {
+                    x * 64,
+                    y * 64,
+                    64,
+                    64
+                };
+                if (SDL_HasIntersection(&playerRect, &coinRect)) {
+                    player->moedas++;
+                    gameMap.tiles[y][x] = 0;
+                }
+            }
+        }
+    }
 }
