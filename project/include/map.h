@@ -60,5 +60,6 @@ void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camer
 bool checkCollision(SDL_Rect a, SDL_Rect b);
 
 bool checkEntityBlockCollision(Entity *player);
+void checkMapTransition(Entity *player, SDL_Renderer *renderer, SDL_Texture *bloco_texture);
 
 #endif // !__MAP_H__

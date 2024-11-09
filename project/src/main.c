@@ -95,7 +95,8 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Fundo preto
         SDL_RenderClear(renderer);
 
-        loadMap("./project/assets/map/map.txt");
+        loadMap("./project/assets/map/map_0.txt");//quantas vezes isso roda?
+
         renderizarBotao(renderer, &botaoJogar, font, "Jogar");
         renderizarBotao(renderer, &botaoInstrucoes, font, "Comandos");
         renderizarBotao(renderer, &botaoSair, font, "Sair");
@@ -168,7 +169,7 @@ int main(int argc, char* argv[]) {
                 running = false;
             }
             renderPlayerLife(&player, renderer, font);
-
+            checkMapTransition(&player, renderer, bloco_texture);
             SDL_RenderPresent(renderer);
 
             SDL_Delay(16);

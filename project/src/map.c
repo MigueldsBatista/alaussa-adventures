@@ -146,3 +146,21 @@ bool checkEntityBlockCollision(Entity *player) {
     }
     return false;
 }
+
+void checkMapTransition(Entity *player, SDL_Renderer *renderer, SDL_Texture *bloco_texture) {
+    static int currentMap = 0;
+    char mapFile[256];
+
+    if (player->position.x + player->width >= SCREEN_WIDTH) {
+        currentMap++;
+        snprintf(mapFile, sizeof(mapFile), "project/assets/map/map_%d.txt", currentMap); // Formata o nome do próximo mapa
+        loadMap(mapFile); // Carrega o próximo mapa
+        player->position.x = 0; // Reseta a posição do jogador para o início do novo mapa
+    } else if (player->position.x <= 0 && currentMap > 0) {
+        currentMap--;
+        snprintf(mapFile, sizeof(mapFile), "project/assets/map/map_%d.txt", currentMap); // Formata o nome do mapa anterior
+        loadMap(mapFile); // Carrega o mapa anterior
+        player->position.x = SCREEN_WIDTH - player->width; // Reseta a posição do jogador para o final do mapa anterior
+    }
+    renderMap(renderer, bloco_texture);
+}

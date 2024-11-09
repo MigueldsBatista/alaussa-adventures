@@ -46,12 +46,14 @@ void updateEnemies(SDL_Renderer *renderer) {
     }
 }
 
+
 void freeEnemyList() {
     for (int i = 0; i < enemyList.enemyCount; i++) {
         free(enemyList.enemies[i]);
     }
     enemyList.enemyCount = 0;
 }
+
 
 void checkPlayerEnemyCollision(Entity *player, EnemyList *enemyList) {
     SDL_Rect playerRect = {
