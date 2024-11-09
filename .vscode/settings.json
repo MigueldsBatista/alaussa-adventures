@@ -65,6 +65,7 @@
     "player.h": "c",
     "stdio.h": "c",
     "sdl_image.h": "c",
-    "random": "c"
+    "random": "c",
+    "type_traits": "c"
   }
 }

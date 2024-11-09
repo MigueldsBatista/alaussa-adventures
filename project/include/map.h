@@ -57,6 +57,7 @@ void renderMap(SDL_Renderer* renderer);
  */
 void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camera_position, int screen_width, int screen_height);
 
+void checkCoinCollected(Entity*player, SDL_Renderer *renderer);
 
 bool checkEntityBlockCollision(Entity *player);
 void checkMapTransition(Entity *player, SDL_Renderer *renderer);

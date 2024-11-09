@@ -45,9 +45,16 @@ void loadMap(const char* map_file) {
 
 // The first line contains the width and height of the map.
 // The following lines contain the tile values for each row of the map.
+static int first_time_render = 0;
+static SDL_Texture* bloco_texture;
+static SDL_Texture* coin_texture;
+
 void renderMap(SDL_Renderer* renderer) {
-    SDL_Texture* bloco_texture = loadTexture("project/assets/blocks/block.png", renderer);
-    SDL_Texture *coin_texture = loadTexture("project/assets/blocks/coin.png", renderer);
+    if(first_time_render == 0){
+        first_time_render = 1;
+        bloco_texture = loadTexture("project/assets/blocks/block.png", renderer);
+        coin_texture = loadTexture("project/assets/blocks/coin.png", renderer);
+    }
 
     //TODO: Implementar a função renderMap
     for (int y = 0; y < gameMap.height; y++) {
@@ -65,9 +72,7 @@ void renderMap(SDL_Renderer* renderer) {
             }
 
             if(tile==3){
-                gameMap.tiles[y][x]=0;
                 SDL_RenderCopy(renderer, coin_texture, NULL, &dst_rect);
-
             }
         }
     }
@@ -108,7 +113,7 @@ bool checkEntityBlockCollision(Entity *player) {
 
     for (int y = 0; y < gameMap.height; y++) {
         for (int x = 0; x < gameMap.width; x++) {
-            if (gameMap.tiles[y][x] > 0) {  // Somente checar blocos sólidos
+            if (gameMap.tiles[y][x] > 0 && gameMap.tiles[y][x]!=3) {  // Somente checar blocos sólidos
                 SDL_Rect blockRect = { 
                     (int)(x * 64 * escala), 
                     (int)(y * 64 * escala), 
@@ -147,34 +152,36 @@ bool checkEntityBlockCollision(Entity *player) {
     return false;
 }
 
+;
 void checkMapTransition(Entity *player, SDL_Renderer *renderer) {
     static int currentMap = 0;
     char mapFile[256];
 
     if (player->position.x + player->width >= SCREEN_WIDTH) {
         currentMap++;
+        freeEnemyList();
         snprintf(mapFile, sizeof(mapFile), "project/assets/map/map_%d.txt", currentMap); // Formata o nome do próximo mapa
         loadMap(mapFile); // Carrega o próximo mapa
         player->position.x = 0; // Reseta a posição do jogador para o início do novo mapa
-    } else if (player->position.x <= 0 && currentMap > 0) {
-        currentMap--;
-        snprintf(mapFile, sizeof(mapFile), "project/assets/map/map_%d.txt", currentMap); // Formata o nome do mapa anterior
-        loadMap(mapFile); // Carrega o mapa anterior
-        player->position.x = SCREEN_WIDTH - player->width; // Reseta a posição do jogador para o final do mapa anterior
-        freeEnemyList();
-    }
+    } //else if (player->position.x <= 0 && currentMap > 0) {
+      //  currentMap--;
+      //  snprintf(mapFile, sizeof(mapFile), "project/assets/map/map_%d.txt", currentMap); // Formata o nome do mapa anterior
+     //   loadMap(mapFile); // Carrega o mapa anterior
+      //  player->position.x = SCREEN_WIDTH - player->width; // Reseta a posição do jogador para o final do mapa anterior
+       // freeEnemyList();
+    //}
 
     renderMap(renderer);
 }
 
-void checkCoinCollected(Entity*player, SDL_Renderer *renderer, SDL_Texture *block_texture){
+void checkCoinCollected(Entity*player, SDL_Renderer *renderer){
     SDL_Rect playerRect = {
         (int)player->position.x,
         (int)player->position.y,
         player->width,
         player->height
     };
-    
+     
     for (int y = 0; y < gameMap.height; y++) {
         for (int x = 0; x < gameMap.width; x++) {
             if (gameMap.tiles[y][x] == 3) {
@@ -184,6 +191,7 @@ void checkCoinCollected(Entity*player, SDL_Renderer *renderer, SDL_Texture *bloc
                     64,
                     64
                 };
+
                 if (SDL_HasIntersection(&playerRect, &coinRect)) {
                     player->moedas++;
                     gameMap.tiles[y][x] = 0;

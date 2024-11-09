@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
             updateEntity(&player, renderer);
             updateEnemies(renderer);
             atualizarImortalidade(&player, deltaTime);
-
+            checkCoinCollected(&player, renderer);
             checkPlayerEnemyCollision(&player, &enemyList);
 
             // Implementação do chão e limites da tela
@@ -183,15 +183,15 @@ int main(int argc, char* argv[]) {
 
             if (!player.isAlive) {
                 showGameOverScreen(renderer, font);
-                SDL_Delay(2000);  // Pequeno atraso para exibir "Game Over"
+                SDL_Delay(50);  // Pequeno atraso para exibir "Game Over"
                 goto menu;  // Retorna ao menu
             }
             
             renderPlayerLife(&player, renderer, font);
             checkMapTransition(&player, renderer);
             SDL_RenderPresent(renderer);
-
-                SDL_Delay(16);// Delay para controlar o FPS
+                //1000ms / 60fps = 16.6666666667ms
+                SDL_Delay(7);// Delay para controlar o FPS
             }
         // Libera recursos do jogador
         for (int i = 0; i < player.totalFrames; i++) {
