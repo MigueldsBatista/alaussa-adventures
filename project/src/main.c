@@ -13,6 +13,7 @@
 #include "utils.h"
 #include "enemy.h"  // Inclusão do arquivo de inimigos
 #include "player.h" // Inclusão do arquivo de jogador
+#include "menupause.h"
 
 bool noMenu = true;
 bool running = true;
@@ -129,6 +130,9 @@ int main(int argc, char* argv[]) {
                         while (SDL_PollEvent(&event)) {
                             if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
                                 paused = false;
+                                if(paused){
+                                    verificarPausa(renderer, font);
+                                }
                             }
                         }
                     }
