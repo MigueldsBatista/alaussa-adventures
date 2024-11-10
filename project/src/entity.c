@@ -110,7 +110,12 @@ void updateEntity(Entity *entity, SDL_Renderer *renderer) {
     }
 
     // Define a animação correta com base no estado e velocidade
-    if (entity->position.onGround) {
+    if(entity->imortalidadeAtiva){
+        freeAnimationFrames(entity);
+        loadAnimationFrames(entity, TAKING_DAMAGE, renderer);
+    }
+    
+    else if(entity->position.onGround) {
         if(entity->position.velX == 0 && entity->position.velY == 0){
             entity->currentFrame = 0;
             freeAnimationFrames(entity);
@@ -149,6 +154,11 @@ void renderEntity(Entity *entity, SDL_Renderer *renderer) {
         .w = entity->width,
         .h = entity->height
     };
+    if (entity->animationFrames[entity->currentFrame] == NULL) {
+        printf("Erro: Textura de animação não está carregada.\n");
+        return;  // Não renderiza se a textura for NULL
+    }
+
     SDL_RenderCopy(renderer, entity->animationFrames[entity->currentFrame], NULL, &dstRect);
 }
 
@@ -190,7 +200,9 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) 
         frameCount = 1;
     } else {
         switch (action) {
-            case IDLE: frameCount = 1; break;
+            case IDLE: 
+            case TAKING_DAMAGE: frameCount = 1;
+            break;
             case MOVE_LEFT:
             case MOVE_RIGHT: frameCount = 3; break;
             case JUMP_RIGHT:
@@ -224,6 +236,11 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) 
             } else if (action == JUMP_RIGHT) {
                 sprintf(filename, "project/assets/MovPlayer/player_jump_right_%d.png", i);
             }
+            else if(action == TAKING_DAMAGE) {
+                printf("Entrou aq\n");
+                sprintf(filename, "project/assets/MovPlayer/player_damage.png");
+
+            }
             
         } else if (entity->label == ENEMY) {
             // Enemy animations
@@ -239,7 +256,7 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) 
         // Carrega a imagem da textura
         surface = IMG_Load(filename);
         if (surface == NULL) {
-            printf("Falha ao carregar a imagem: %s\n", filename);
+            printf("Falha ao carregar a imagem: %s, SDL_Error: %s\n", filename, SDL_GetError());
             entity->animationFrames[i] = NULL;
         } else {
             entity->animationFrames[i] = SDL_CreateTextureFromSurface(renderer, surface);

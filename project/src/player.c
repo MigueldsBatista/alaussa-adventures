@@ -31,3 +31,26 @@ void renderPlayerCoins(Entity *player, SDL_Renderer *renderer, TTF_Font *font){
     SDL_DestroyTexture(texture);
     }
 }
+
+#include <time.h>
+
+void writePlayerInfo(Entity *player, const char* playerName) {
+    // Abrindo o arquivo em modo de anexação ("a")
+    FILE *file = fopen("ranking.txt", "a");
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo de ranking\n");
+        return;
+    }
+
+    // Obtendo a data e hora atual
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    char dateTime[100];
+    strftime(dateTime, sizeof(dateTime)-1, "%Y-%m-%d %H:%M:%S", t);
+
+    // Escrevendo as informações do jogador no arquivo
+    fprintf(file, "Jogador: %s | Pontuação: %d | Data e Hora: %s\n", playerName, player->moedas, dateTime);
+
+    // Fechando o arquivo
+    fclose(file);
+}

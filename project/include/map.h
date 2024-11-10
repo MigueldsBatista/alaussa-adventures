@@ -3,9 +3,13 @@
 
 #include <SDL2/SDL.h>
 #include "entity.h"
+#include <SDL2/SDL_ttf.h>
 
 #define MAX_MAP_WIDTH 100
 #define MAX_MAP_HEIGHT 100
+
+#define CENTER_HEIGHT 540
+#define CENTER_WIDTH 960
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
@@ -62,4 +66,5 @@ void checkCoinCollected(Entity*player, SDL_Renderer *renderer);
 bool checkEntityBlockCollision(Entity *player);
 void checkMapTransition(Entity *player, SDL_Renderer *renderer);
 
+bool checkPlayerInFinishPosition(Entity *player, SDL_Renderer *renderer, TTF_Font *font);
 #endif // !__MAP_H__

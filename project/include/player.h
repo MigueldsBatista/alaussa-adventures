@@ -6,5 +6,5 @@
 
 void renderPlayerLife(Entity *player, SDL_Renderer *renderer, TTF_Font *font);
 void renderPlayerCoins(Entity *player, SDL_Renderer *renderer, TTF_Font *font);
-
+void writePlayerInfo(Entity *player, const char* playerName);
 #endif // !__PLAYER_H

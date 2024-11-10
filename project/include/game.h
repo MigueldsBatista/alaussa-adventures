@@ -2,6 +2,8 @@
 #define __GAME_H__
 #include <SDL2/SDL.h>
 #include <stdbool.h>
+#include <SDL2/SDL_ttf.h>
+
 #define GRAVIDADE 250.0
 #define DELTA_TIME 0.09
 /**
@@ -21,7 +23,7 @@ void initGame(SDL_Renderer* renderer);
  * and rendering the game. It runs continuously until the game is
  * terminated.
  */
-void gameLoop(SDL_Renderer* renderer);
+void gameLoop(SDL_Renderer* renderer, TTF_Font* font);
 
 /**
  * @brief Shuts down the game and performs necessary cleanup operations.

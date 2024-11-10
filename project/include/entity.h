@@ -27,6 +27,7 @@ typedef enum {
     JUMP_RIGHT,
     FALL_LEFT,
     FALL_RIGHT,
+    TAKING_DAMAGE
 } Action;
 
 typedef enum{
@@ -59,6 +60,7 @@ typedef struct {
     bool imortalidadeAtiva;
     float imortalidadeTimer;
     int moedas;
+
 } Entity;
 
 /**

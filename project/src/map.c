@@ -6,6 +6,8 @@
 #include "entity.h"
 #include "enemy.h"
 #include "sprite.h"
+#include <SDL2/SDL_ttf.h>
+#include "menu.h"
 const float escala = 0.5; // Ajuste conforme a proporção da tela minimizada
 
 
@@ -49,12 +51,17 @@ void loadMap(const char* map_file) {
 static int first_time_render = 0;
 static SDL_Texture* bloco_texture;
 static SDL_Texture* coin_texture;
-
+static SDL_Texture* torreFirst;
+static SDL_Texture* torreSecond;
+static SDL_Texture* torreThird;
 void renderMap(SDL_Renderer* renderer) {
     if(first_time_render == 0){
         first_time_render = 1;
         bloco_texture = loadTexture("project/assets/blocks/block.png", renderer);
         coin_texture = loadTexture("project/assets/blocks/coin.png", renderer);
+        torreFirst = loadTexture("project/assets/map/torre_0.png", renderer);
+        torreSecond = loadTexture("project/assets/map/torre_1.png", renderer);
+        torreThird = loadTexture("project/assets/map/torre_2.png", renderer);
     }
 
     //TODO: Implementar a função renderMap
@@ -74,6 +81,15 @@ void renderMap(SDL_Renderer* renderer) {
 
             if(tile==3){
                 SDL_RenderCopy(renderer, coin_texture, NULL, &dst_rect);
+            }
+            if(tile==4){
+                SDL_RenderCopy(renderer, torreThird, NULL, &dst_rect);
+            }
+            if(tile==5){
+                SDL_RenderCopy(renderer, torreSecond, NULL, &dst_rect);
+            }
+            if(tile==6){
+                SDL_RenderCopy(renderer, torreFirst, NULL, &dst_rect);
             }
         }
     }
@@ -114,14 +130,14 @@ bool checkEntityBlockCollision(Entity *player) {
 
     for (int y = 0; y < gameMap.height; y++) {
         for (int x = 0; x < gameMap.width; x++) {
-            if (gameMap.tiles[y][x] > 0 && gameMap.tiles[y][x]!= 3) {  // Somente checar blocos sólidos
+            if (gameMap.tiles[y][x] > 0 && gameMap.tiles[y][x]!= 3 && gameMap.tiles[y][x]!=4 && gameMap.tiles[y][x]!= 5 && gameMap.tiles[y][x]!= 6 ) {  // Somente checar blocos sólidos
                 SDL_Rect blockRect = { 
                     (int)(x * 64 * escala), 
                     (int)(y * 64 * escala), 
                     (int)(64 * escala), 
                     (int)(64 * escala) 
                 };
-                
+            
                 if (SDL_HasIntersection(&playerRect, &blockRect)==SDL_TRUE) {
                     // Colisão por cima (o jogador aterrissa no bloco)
                     if (playerRect.y + playerRect.h <= blockRect.y + 5 && player->position.velY >= 0) {
@@ -200,4 +216,31 @@ void checkCoinCollected(Entity*player, SDL_Renderer *renderer){
             }
         }
     }
+}
+
+bool checkPlayerInFinishPosition(Entity *player, SDL_Renderer *renderer, TTF_Font *font) {
+    SDL_Rect playerRect = {
+        (int)player->position.x,
+        (int)player->position.y,
+        player->width,
+        player->height
+    };
+     
+    for (int y = 0; y < gameMap.height; y++) {
+        for (int x = 0; x < gameMap.width; x++) {
+            if (gameMap.tiles[y][x] == 4 || gameMap.tiles[y][x] == 5 || gameMap.tiles[y][x] == 6) {
+                SDL_Rect finishRect = {
+                    x * 64,
+                    y * 64,
+                    64,
+                    64
+                };
+
+                if (SDL_HasIntersection(&playerRect, &finishRect)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }

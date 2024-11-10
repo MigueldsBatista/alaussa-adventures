@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "map.h"
+#include <SDL2/SDL_ttf.h>
 EnemyList enemyList = { .enemyCount = 0 };
 
 void moveEnemyLeft(Entity *entity) {
@@ -63,7 +64,7 @@ void updateEnemies(SDL_Renderer *renderer) {
                 }
             }
         }
-        
+
         // Atualiza a posição horizontal do inimigo
         enemy->position.x += enemy->position.velX * DELTA_TIME;
         // Atualiza (queda)
