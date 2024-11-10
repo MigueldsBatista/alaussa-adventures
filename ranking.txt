@@ -19,3 +19,6 @@ Jogador: aaaaa | Pontuação: 6 | Data e Hora: 2024-11-10 16:14:28
 Jogador: aaaaaaa | Pontuação: 3 | Data e Hora: 2024-11-10 16:15:08
 Jogador: aaaaa | Pontuação: 4 | Data e Hora: 2024-11-10 16:15:28
 Jogador: aaaaa | Pontuação: 4 | Data e Hora: 2024-11-10 16:15:54
+Jogador: al� | Pontuação: 4 | Data e Hora: 2024-11-10 18:40:56
+Jogador:  | Pontuação: 4 | Data e Hora: 2024-11-10 18:54:31
+Jogador:  | Pontuação: 4 | Data e Hora: 2024-11-10 18:54:46
