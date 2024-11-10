@@ -224,6 +224,7 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) 
             } else if (action == JUMP_RIGHT) {
                 sprintf(filename, "project/assets/MovPlayer/player_jump_right_%d.png", i);
             }
+            
         } else if (entity->label == ENEMY) {
             // Enemy animations
             if (action == MOVE_LEFT) {
@@ -234,13 +235,11 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) 
                 sprintf(filename, "project/assets/MovEnemy/enemy_idle_%d.png", i);
             }
         }
-        else if(entity->isAlive == false){
-            sprintf(filename, "project/assets/MovPlayer/player_gameover_%d.png", i);
-        }
+
         // Carrega a imagem da textura
         surface = IMG_Load(filename);
         if (surface == NULL) {
-            printf("Falha ao carregar a imagem: %s\n", IMG_GetError());
+            printf("Falha ao carregar a imagem: %s\n", filename);
             entity->animationFrames[i] = NULL;
         } else {
             entity->animationFrames[i] = SDL_CreateTextureFromSurface(renderer, surface);
@@ -264,8 +263,11 @@ void moveRight(Entity *entity) {
 }
 
 void atualizarImortalidade(Entity *entity, float deltaTime) {
+    extern SDL_Renderer *renderer;
     if (entity->imortalidadeAtiva) {
         entity->imortalidadeTimer -= deltaTime;  // Diminui o temporizador
+        SDL_DestroyTexture(entity->animationFrames[entity->currentFrame]);
+        renderEntity(entity, renderer);
         if (entity->imortalidadeTimer <= 0) {
             entity->imortalidadeAtiva = false;  // Desativa a imortalidade
         }

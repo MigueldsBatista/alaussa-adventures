@@ -54,6 +54,7 @@ void updateEnemies(SDL_Renderer *renderer) {
             if (enemy->position.velX == 0) {
                 moveEnemyLeft(enemy);
             }
+
             if (checkEntityBlockCollision(enemy)) {
                 if (enemy->position.velX > 0) {
                     moveEnemyLeft(enemy);
@@ -62,6 +63,7 @@ void updateEnemies(SDL_Renderer *renderer) {
                 }
             }
         }
+        
         // Atualiza a posição horizontal do inimigo
         enemy->position.x += enemy->position.velX * DELTA_TIME;
         // Atualiza (queda)

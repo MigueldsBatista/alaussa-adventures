@@ -16,6 +16,7 @@ typedef struct {
     int tiles[MAX_MAP_HEIGHT][MAX_MAP_WIDTH]; // Exemplo de representação do mapa
 } Map;
 
+
 Map gameMap; // Instância do mapa
 
 void loadMap(const char* map_file) {
@@ -113,7 +114,7 @@ bool checkEntityBlockCollision(Entity *player) {
 
     for (int y = 0; y < gameMap.height; y++) {
         for (int x = 0; x < gameMap.width; x++) {
-            if (gameMap.tiles[y][x] > 0 && gameMap.tiles[y][x]!=3) {  // Somente checar blocos sólidos
+            if (gameMap.tiles[y][x] > 0 && gameMap.tiles[y][x]!= 3) {  // Somente checar blocos sólidos
                 SDL_Rect blockRect = { 
                     (int)(x * 64 * escala), 
                     (int)(y * 64 * escala), 
@@ -130,7 +131,7 @@ bool checkEntityBlockCollision(Entity *player) {
                         return true;
                     }
                     // Colisão por baixo (o jogador bate a cabeça no bloco)
-                    else if (playerRect.y >= blockRect.y + blockRect.h - 5 && player->position.velY < 0) {
+                    else if (playerRect.y >= blockRect.y + blockRect.h && player->position.velY < 0) {
                         player->position.y = (blockRect.y + blockRect.h) / escala;
                         player->position.velY = 0;  // Zera a velocidade vertical ao colidir por baixo
                         return true;

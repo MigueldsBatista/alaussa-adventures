@@ -2,11 +2,48 @@
 #include <SDL2/SDL_ttf.h>
 #include "menu.h"
 
-// ver se a pessoa clicou no botão
-bool pontoDentroDoRetangulo(int x, int y, SDL_Rect *rect) {
-    return x >= rect->x && x <= rect->x + rect->w &&
-           y >= rect->y && y <= rect->y + rect->h;
+
+// Função para exibir o menu
+bool mostrarMenu(SDL_Renderer* renderer, TTF_Font* font) {
+    extern bool noMenu;
+    extern bool running;
+    extern SDL_Event event;
+    Botao botaoJogar = {{230, 100, 200, 50}, {0, 255, 0, 255}};
+    Botao botaoInstrucoes = {{230, 200, 200, 50}, {255, 255, 0, 255}};
+    Botao botaoSair = {{230, 300, 200, 50}, {255, 0, 0, 255}};
+
+    while (noMenu) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                noMenu = false;
+                running = false;
+            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                if (pontoDentroDoRetangulo(x, y, &botaoJogar.rect)) {
+                    noMenu = false;
+                } else if (pontoDentroDoRetangulo(x, y, &botaoInstrucoes.rect)) {
+                    mostrarInstrucoes(renderer, font);
+                } else if (pontoDentroDoRetangulo(x, y, &botaoSair.rect)) {
+                    noMenu = false;
+                    running = false;
+                }
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        loadMap("./project/assets/map/map_0.txt");
+        renderizarBotao(renderer, &botaoJogar, font, "Jogar");
+        renderizarBotao(renderer, &botaoInstrucoes, font, "Comandos");
+        renderizarBotao(renderer, &botaoSair, font, "Sair");
+        SDL_RenderPresent(renderer);
+    }
+
+    return noMenu;
 }
+
 
 //função de criar botão
 void renderizarBotao(SDL_Renderer *renderer, Botao *botao, TTF_Font *font, const char *text) {
@@ -90,7 +127,8 @@ void showGameOverScreen(SDL_Renderer* renderer, TTF_Font* font) {
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                if (pontoDentroDoRetangulo(x, y, &botaoRestart.rect)) {
+                SDL_Point ponto = {x, y};
+                if (SDL_PointInRect(&ponto, &botaoRestart.rect)) {
                     gameOver = false;  // Restart the game
                     running = true;
                 }
