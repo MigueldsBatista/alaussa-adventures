@@ -10,11 +10,9 @@
 #include <SDL2/SDL_ttf.h>
 
 void initGame(SDL_Renderer* renderer) {
-    //TODO: Implementar a inicialização do jogo
-    //initEnemy(); // Inicializa inimigos
-    loadMap("project/assets/images/parallax.png"); // Carrega o mapa
+    // Inicializa o jogo, carregando o mapa e inimigos (se necessário)
+    loadMap("project/assets/images/parallax.png");
 }
-
 
 void gameLoop(SDL_Renderer* renderer, TTF_Font* font) {
     Uint32 lastTime = SDL_GetTicks();
@@ -22,6 +20,9 @@ void gameLoop(SDL_Renderer* renderer, TTF_Font* font) {
     extern bool running;
     extern bool paused;
     extern SDL_Event event;
+    int camera_position = 0;
+
+    SDL_Texture *background = loadTexture("project/assets/map/background_game.png", renderer, "background");
     loadMap("project/assets/map/map_0.txt");
 
     // Inicializa o jogador
@@ -38,12 +39,11 @@ void gameLoop(SDL_Renderer* renderer, TTF_Font* font) {
             if (event.type == SDL_QUIT) {
                 running = false;
             } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
-                // Pausa o jogo
                 paused = true;
                 while (paused) {
                     while (SDL_PollEvent(&event)) {
                         if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
-                            paused = !paused;
+                            paused = false;
                         }
                         if (paused) {
                             mostrarMenuPausa(renderer, font);
@@ -54,7 +54,7 @@ void gameLoop(SDL_Renderer* renderer, TTF_Font* font) {
             handleEntityInput(&event, &player);
         }
 
-        // Atualiza o jogador e inimigos
+        // Atualiza o jogador, inimigos e a lógica do jogo
         updateEntity(&player, renderer);
         updateEnemies(renderer);
         atualizarImortalidade(&player, deltaTime);
@@ -63,7 +63,7 @@ void gameLoop(SDL_Renderer* renderer, TTF_Font* font) {
         checkCoinCollected(&player, renderer);
         checkPlayerEnemyCollision(&player, &enemyList);
 
-        // Restringe o jogador ao limite da tela e ao solo
+        // Limita o jogador ao chão e às bordas da tela
         if (player.position.y + player.height >= GROUND_LEVEL) {
             player.position.y = GROUND_LEVEL - player.height;
             player.position.velY = 0;
@@ -76,56 +76,63 @@ void gameLoop(SDL_Renderer* renderer, TTF_Font* font) {
             player.position.x = SCREEN_WIDTH - player.width;
         }
 
+        // Checa se o jogador chegou ao final do mapa
         if (checkPlayerInFinishPosition(&player, renderer, font)) {
             mostrarMenuFimDeJogo(renderer, font);
             writePlayerInfo(&player, playerName);
-            return;  // Retorna para o loop principal do jogo
+            return;
         }
-
-        // Renderiza a tela
-        SDL_RenderClear(renderer);
-
-        // Desenha o chão
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        SDL_Rect groundRect = {0, GROUND_LEVEL, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_LEVEL};
-        SDL_RenderFillRect(renderer, &groundRect);
-
-        // Renderiza o mapa, o jogador e os inimigos
-        renderMap(renderer);
-        renderEntity(&player, renderer);
-        renderEnemies(renderer);
 
         // Verifica se o jogador morreu
         if (!player.isAlive) {
             showGameOverScreen(renderer, font);
             writePlayerInfo(&player, playerName);
             SDL_Delay(50);
-            return;  // Retorna ao menu
+            return;
         }
+
+        // Renderização
+        SDL_RenderClear(renderer);
+
+        // Renderiza o fundo
+        renderBackground(renderer, background, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        // Renderiza o mapa
+        renderMap(renderer);
+
+        // Desenha o chão
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_Rect groundRect = {0, GROUND_LEVEL, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_LEVEL};
+        SDL_RenderFillRect(renderer, &groundRect);
+
+        // Renderiza o jogador e os inimigos
+        renderEntity(&player, renderer);
+        renderEnemies(renderer);
 
         // Renderiza informações de vida e moedas
         renderPlayerLife(&player, renderer, font);
         renderPlayerCoins(&player, renderer, font);
 
-        // Verifica transição de mapa
-        checkMapTransition(&player, renderer);
-
-        // Exibe a renderização
+        // Atualiza a tela
         SDL_RenderPresent(renderer);
 
-        // Controla a taxa de quadros
+        // Simula o movimento da câmera
+        camera_position += 2;
+
+        // Controla a taxa de quadros (60 FPS)
         SDL_Delay(16);
     }
 
-    // Libera os recursos do jogador
+    // Libera os recursos alocados
     for (int i = 0; i < player.totalFrames; i++) {
         SDL_DestroyTexture(player.animationFrames[i]);
     }
     free(player.animationFrames);
     freeEnemyList();
+    SDL_DestroyTexture(background);
 }
 
-void shutdownGame(){
-//TODO: Implementar a finalização do jogo    
-return;
+void shutdownGame() {
+    // Finaliza o jogo, liberando recursos
+    return;
 }

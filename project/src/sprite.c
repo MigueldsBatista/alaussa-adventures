@@ -11,24 +11,20 @@ return;
 
 }
 
-SDL_Texture* loadTexture(const char* file, SDL_Renderer* renderer) {
+SDL_Texture* loadTexture(const char* file, SDL_Renderer* renderer, const char* name){
     SDL_Surface* surface = IMG_Load(file);
     if (!surface) {
-        printf("Erro ao carregar a imagem: %s\n", IMG_GetError());
+        printf("Erro ao carregar a imagem: %s\n", name);
         return NULL;
     }
     
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     if (!texture) {
-        printf("Erro ao criar textura: %s\n", SDL_GetError());
+        printf("Erro ao criar textura: %s\n", name);
     }
 
     SDL_FreeSurface(surface);
     return texture;
 }
 
-void updateSprite(Sprite* sprite){
-//TODO: Implementar a atualização do sprite
-return;
-}
 

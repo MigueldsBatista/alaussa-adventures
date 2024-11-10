@@ -8,11 +8,12 @@
 #define MAX_MAP_WIDTH 100
 #define MAX_MAP_HEIGHT 100
 
-#define CENTER_HEIGHT 540
-#define CENTER_WIDTH 960
-
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
+
+#define CENTER_HEIGHT SCREEN_HEIGHT/2
+#define CENTER_WIDTH SCREEN_WIDTH/2
+
 #define GROUND_LEVEL (SCREEN_HEIGHT - 50) // Altura do chão a 50 pixels do fundo
 
 
@@ -59,7 +60,7 @@ void renderMap(SDL_Renderer* renderer);
  * @param camera_position The current position of the camera, used to determine 
  *                        the portion of the background to render.
  */
-void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camera_position, int screen_width, int screen_height);
+void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int screen_width, int screen_height);
 
 void checkCoinCollected(Entity*player, SDL_Renderer *renderer);
 
@@ -67,4 +68,6 @@ bool checkEntityBlockCollision(Entity *player);
 void checkMapTransition(Entity *player, SDL_Renderer *renderer);
 
 bool checkPlayerInFinishPosition(Entity *player, SDL_Renderer *renderer, TTF_Font *font);
+
+
 #endif // !__MAP_H__

@@ -50,70 +50,59 @@ void loadMap(const char* map_file) {
 // The following lines contain the tile values for each row of the map.
 static int first_time_render = 0;
 static SDL_Texture* bloco_texture;
+static SDL_Texture* brick_texture;
 static SDL_Texture* coin_texture;
 static SDL_Texture* torreFirst;
 static SDL_Texture* torreSecond;
 static SDL_Texture* torreThird;
+
 void renderMap(SDL_Renderer* renderer) {
-    if(first_time_render == 0){
+    if (first_time_render == 0) {
         first_time_render = 1;
-        bloco_texture = loadTexture("project/assets/blocks/block.png", renderer);
-        coin_texture = loadTexture("project/assets/blocks/coin.png", renderer);
-        torreFirst = loadTexture("project/assets/map/torre_0.png", renderer);
-        torreSecond = loadTexture("project/assets/map/torre_1.png", renderer);
-        torreThird = loadTexture("project/assets/map/torre_2.png", renderer);
+        bloco_texture = loadTexture("project/assets/blocks/block.png", renderer, "bloco");
+        brick_texture = loadTexture("project/assets/blocks/brick_game.png", renderer, "brick");
+        coin_texture = loadTexture("project/assets/blocks/coin.png", renderer, "coin");
+        torreFirst = loadTexture("project/assets/map/torre_0.png", renderer, "torre");
+        torreSecond = loadTexture("project/assets/map/torre_1.png", renderer, "torre");
+        torreThird = loadTexture("project/assets/map/torre_2.png", renderer, "torre");
     }
 
-    //TODO: Implementar a função renderMap
     for (int y = 0; y < gameMap.height; y++) {
         for (int x = 0; x < gameMap.width; x++) {
             int tile = gameMap.tiles[y][x];
-            SDL_Rect dst_rect = { x * 64, y * 64, 64, 64 }; // Define a posição e o tamanho do tile
+            SDL_Rect dst_rect = { x * 64, y * 64, 64, 64 };
+            SDL_Texture *rendered_texture = NULL;
 
-            if (tile == 1) { // Supondo que um tile "0" é vazio
-                SDL_RenderCopy(renderer, bloco_texture, NULL, &dst_rect);
-                //printf("Bloco renderizado em (%d, %d)\n", x, y);
-            }
-            if(tile == 2){
+            // Seleciona a textura com base no valor do tile
+            if (tile == 1) {
+                rendered_texture = brick_texture;
+                rendered_texture = bloco_texture;
+            } else if (tile == 2) {
                 addEnemy(x * 64, y * 64, renderer);
-                gameMap.tiles[y][x] = 0; // Marca o tile como vazio para evitar adição duplicada        }
+                gameMap.tiles[y][x] = 0; // Marca o tile como vazio para evitar adição duplicada
+            } else if (tile == 3) {
+                rendered_texture = coin_texture;
+            } else if (tile == 4) {
+                rendered_texture = torreThird;
+            } else if (tile == 5) {
+                rendered_texture = torreSecond;
+            } else if (tile == 6) {
+                rendered_texture = torreFirst;
             }
 
-            if(tile==3){
-                SDL_RenderCopy(renderer, coin_texture, NULL, &dst_rect);
-            }
-            if(tile==4){
-                SDL_RenderCopy(renderer, torreThird, NULL, &dst_rect);
-            }
-            if(tile==5){
-                SDL_RenderCopy(renderer, torreSecond, NULL, &dst_rect);
-            }
-            if(tile==6){
-                SDL_RenderCopy(renderer, torreFirst, NULL, &dst_rect);
+            // Executa SDL_RenderCopy apenas uma vez se houver uma textura a ser renderizada
+            if (rendered_texture != NULL) {
+                SDL_RenderCopy(renderer, rendered_texture, NULL, &dst_rect);
             }
         }
     }
 }
 
-void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int camera_position, int screen_width, int screen_height) {
-    //TODO: Implementar a função renderBackground
-    int bg_width = 725;  // Largura da imagem de fundo
-    int bg_height = 400; // Altura da imagem de fundo
-
-    // Calcula o deslocamento do parallax (horizontal)
-    int parallax_offset = camera_position % bg_width;
-
-    // Renderiza a primeira parte da imagem
-    SDL_Rect src_rect1 = { parallax_offset, 0, bg_width - parallax_offset, bg_height };
-    SDL_Rect dst_rect1 = { 0, 0, bg_width - parallax_offset, bg_height };
-    SDL_RenderCopy(renderer, background, &src_rect1, &dst_rect1);
-
-    // Se houver espaço sobrando, renderiza a segunda parte da imagem para "repeti-la"
-    if (screen_width > (bg_width - parallax_offset)) {
-        SDL_Rect src_rect2 = { 0, 0, parallax_offset, bg_height };
-        SDL_Rect dst_rect2 = { bg_width - parallax_offset, 0, parallax_offset, bg_height };
-        SDL_RenderCopy(renderer, background, &src_rect2, &dst_rect2);
-    }
+void renderBackground(SDL_Renderer* renderer, SDL_Texture* background, int screen_width, int screen_height) {
+    // Renderiza a imagem de fundo sem efeito de parallax
+    SDL_Rect src_rect = { 0, 0, screen_width, screen_height };
+    SDL_Rect dst_rect = { 0, 0, screen_width, screen_height };
+    SDL_RenderCopy(renderer, background, &src_rect, &dst_rect);
 }
 
 

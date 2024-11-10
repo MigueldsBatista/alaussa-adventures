@@ -68,13 +68,13 @@ void capturarNomeJogador(SDL_Renderer *renderer, TTF_Font *font) {
         SDL_Color corTexto = {255, 255, 255, 255};  // Cor branca para o texto
         SDL_Surface *surface = TTF_RenderText_Solid(font, playerName, corTexto);
         if (surface == NULL) {
-            printf("Erro ao criar a superfície do texto: %s\n", TTF_GetError());
+            //printf("Erro ao criar a superfície do texto: %s\n", TTF_GetError());
             continue;
         }
 
         SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
         if (texture == NULL) {
-            printf("Erro ao criar a textura do texto: %s\n", SDL_GetError());
+            //printf("Erro ao criar a textura do texto: %s\n", SDL_GetError());
             SDL_FreeSurface(surface);
             continue;
         }
@@ -237,7 +237,7 @@ void showGameOverScreen(SDL_Renderer *renderer, TTF_Font *font) {
     // Botão reiniciar centralizado
     Botao botaoRestart = {
         {CENTER_WIDTH - botaoLargura / 2, CENTER_HEIGHT, botaoLargura, botaoAltura},
-        {255, 0, 0, 255}, "Reiniciar"
+        corAzul, "Reiniciar"
     };
 
     while (gameOver) {
@@ -257,12 +257,15 @@ void showGameOverScreen(SDL_Renderer *renderer, TTF_Font *font) {
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
+        //SDL_RenderClear(renderer);
 
-        // Texto centralizado
-        Texto textoFinish = {
-            (SDL_Point){CENTER_WIDTH - 100, CENTER_HEIGHT - 100}, {255, 255, 255, 255}, "Game Over"};
-        renderizarTexto(renderer, font, &textoFinish);
+        // Botão centralizado com texto "Game Over"
+        Botao botaoFinish = {
+            {CENTER_WIDTH - 100, CENTER_HEIGHT - 100, 200, 50},
+            corVermelha,  // Cor Branca
+            "Game Over"
+        };
+        renderizarBotao(renderer, &botaoFinish, font);
 
         // Renderizar o botão
         renderizarBotao(renderer, &botaoRestart, font);

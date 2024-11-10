@@ -79,65 +79,41 @@ void damageEntity(Entity *entity) {
 }
 
 
-
 void updateEntity(Entity *entity, SDL_Renderer *renderer) {
-    // Aplica a gravidade à velocidade vertical
-
+    // Atualiza a física
     entity->position.velY += GRAVIDADE * DELTA_TIME;
 
-    // Limita a velocidade de queda
     if (entity->position.velY > 100) {
         entity->position.velY = 100;
     }
 
     if (entity->position.velX > 150) {
         entity->position.velX = 150;
-    }
-
-        if (entity->position.velX < -150) {
+    } else if (entity->position.velX < -150) {
         entity->position.velX = -150;
     }
 
-
-    // Atualiza a posição do jogador
     entity->position.x += (entity->position.velX * DELTA_TIME);
     entity->position.y += (entity->position.velY * DELTA_TIME);
 
-    // Verifica a colisão com o bloco e atualiza `onGround`
+    // Checa colisão com blocos
     if (checkEntityBlockCollision(entity)) {
-        entity->position.velY = 0; // Reseta a velocidade vertical ao colidir com o bloco
-        entity->position.onGround = true; // Define que o jogador está no chão
+        entity->position.velY = 0;
+        entity->position.onGround = true;
     }
 
-    // Define a animação correta com base no estado e velocidade
-    if(entity->imortalidadeAtiva){
-        freeAnimationFrames(entity);
+    // Prioriza a animação de dano se a imortalidade estiver ativa
+    if (entity->imortalidadeAtiva) {
         loadAnimationFrames(entity, TAKING_DAMAGE, renderer);
-    }
-    
-    else if(entity->position.onGround) {
-        if(entity->position.velX == 0 && entity->position.velY == 0){
-            entity->currentFrame = 0;
-            freeAnimationFrames(entity);
+    } else if (entity->position.onGround) {
+        if (entity->position.velX == 0) {
             loadAnimationFrames(entity, IDLE, renderer);
-        }
-        else if (entity->position.velX > 0 && entity->position.velY == 0) {
-            // Movimento à direita no chão
-            entity->currentFrame = (entity->currentFrame + 1) % entity->totalFrames;
-            freeAnimationFrames(entity);
+        } else if (entity->position.velX > 0) {
             loadAnimationFrames(entity, MOVE_RIGHT, renderer);
-        }
-        else if (entity->position.velX < 0 && entity->position.velY == 0) {
-            // Movimento à esquerda no chão
-            entity->currentFrame = (entity->currentFrame + 1) % entity->totalFrames;
-            freeAnimationFrames(entity);
+        } else if (entity->position.velX < 0) {
             loadAnimationFrames(entity, MOVE_LEFT, renderer);
         }
-    }
-    else if (!entity->position.onGround) {
-        // Se está no ar, define a animação de pulo
-        entity->currentFrame = (entity->currentFrame + 1) % entity->totalFrames;
-        freeAnimationFrames(entity);
+    } else {
         if (entity->position.velX >= 0) {
             loadAnimationFrames(entity, JUMP_RIGHT, renderer);
         } else {
@@ -146,20 +122,22 @@ void updateEntity(Entity *entity, SDL_Renderer *renderer) {
     }
 }
 
-
 void renderEntity(Entity *entity, SDL_Renderer *renderer) {
+    if (entity->currentFrame >= entity->totalFrames || entity->animationFrames == NULL) {
+        return;
+    }
+
     SDL_Rect dstRect = {
         .x = (int)entity->position.x,
         .y = (int)entity->position.y,
         .w = entity->width,
         .h = entity->height
     };
-    if (entity->animationFrames[entity->currentFrame] == NULL) {
-        printf("Erro: Textura de animação não está carregada.\n");
-        return;  // Não renderiza se a textura for NULL
-    }
 
-    SDL_RenderCopy(renderer, entity->animationFrames[entity->currentFrame], NULL, &dstRect);
+    SDL_Texture *currentTexture = entity->animationFrames[entity->currentFrame];
+    if (currentTexture != NULL) {
+        SDL_RenderCopy(renderer, currentTexture, NULL, &dstRect);
+    }
 }
 
 Action handleEntityInput(SDL_Event *event, Entity *entity) {
@@ -237,9 +215,7 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) 
                 sprintf(filename, "project/assets/MovPlayer/player_jump_right_%d.png", i);
             }
             else if(action == TAKING_DAMAGE) {
-                printf("Entrou aq\n");
                 sprintf(filename, "project/assets/MovPlayer/player_damage.png");
-
             }
             
         } else if (entity->label == ENEMY) {
@@ -256,7 +232,7 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) 
         // Carrega a imagem da textura
         surface = IMG_Load(filename);
         if (surface == NULL) {
-            printf("Falha ao carregar a imagem: %s, SDL_Error: %s\n", filename, SDL_GetError());
+            //printf("Falha ao carregar a imagem: %s, SDL_Error: %s\n", filename, SDL_GetError());
             entity->animationFrames[i] = NULL;
         } else {
             entity->animationFrames[i] = SDL_CreateTextureFromSurface(renderer, surface);
@@ -280,13 +256,11 @@ void moveRight(Entity *entity) {
 }
 
 void atualizarImortalidade(Entity *entity, float deltaTime) {
-    extern SDL_Renderer *renderer;
     if (entity->imortalidadeAtiva) {
-        entity->imortalidadeTimer -= deltaTime;  // Diminui o temporizador
-        SDL_DestroyTexture(entity->animationFrames[entity->currentFrame]);
-        renderEntity(entity, renderer);
+        entity->imortalidadeTimer -= deltaTime;
+
         if (entity->imortalidadeTimer <= 0) {
-            entity->imortalidadeAtiva = false;  // Desativa a imortalidade
+            entity->imortalidadeAtiva = false;
         }
     }
 }

@@ -38,7 +38,7 @@ typedef struct {
  * @param renderer The SDL_Renderer used to render the texture.
  * @return SDL_Texture* The loaded texture, or NULL if loading fails.
  */
-SDL_Texture* loadTexture(const char* file, SDL_Renderer* renderer);
+SDL_Texture* loadTexture(const char* file, SDL_Renderer* renderer, const char* name);
 
 /**
  * @brief Renders a sprite on the screen.
