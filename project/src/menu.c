@@ -3,27 +3,33 @@
 #include "menu.h"
 #include "map.h"
 
-char playerName[50];  // Definição da variável global
+#define MAX_NAME_LENGTH 50  // Definição do tamanho máximo para o nome do jogador
 
-SDL_Color corPreta = {0, 0, 0, 255};// Cor do texto é preta
-SDL_Color corBranca = {255, 255, 255, 255};// Cor do texto é branca
+char playerName[MAX_NAME_LENGTH];  // Definição da variável global
 
-SDL_Color corBotao ={0, 255, 0, 255};
+// Definição de cores
+SDL_Color corPreta = {0, 0, 0, 255};
+SDL_Color corBranca = {255, 255, 255, 255};
+SDL_Color corBotao = {0, 255, 0, 255};
 SDL_Color corVermelha = {255, 0, 0, 255};
 SDL_Color corAmarela = {255, 255, 0, 255};
 SDL_Color corAzul = {0, 0, 255, 255};
-/// Função para renderizar um botão
+
+// Função para renderizar um botão
 void renderizarBotao(SDL_Renderer *renderer, Botao *botao, TTF_Font *font) {
-    // Criação do retângulo do botão
     SDL_SetRenderDrawColor(renderer, botao->color.r, botao->color.g, botao->color.b, botao->color.a);
     SDL_RenderFillRect(renderer, &botao->rect);
 
-    // Renderizar o texto no botão
-    SDL_Surface *surface = TTF_RenderText_Solid(font, botao->texto, (SDL_Color){0, 0, 0});
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_Surface *surface = TTF_RenderText_Solid(font, botao->texto, corPreta);
+    if (!surface) return;
 
-    int textWidth = surface->w;
-    int textHeight = surface->h;
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    if (!texture) return;
+
+    int textWidth, textHeight;
+    SDL_QueryTexture(texture, NULL, NULL, &textWidth, &textHeight);
+
     SDL_Rect textRect = {
         botao->rect.x + (botao->rect.w - textWidth) / 2,
         botao->rect.y + (botao->rect.h - textHeight) / 2,
@@ -32,96 +38,101 @@ void renderizarBotao(SDL_Renderer *renderer, Botao *botao, TTF_Font *font) {
     };
 
     SDL_RenderCopy(renderer, texture, NULL, &textRect);
-    SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
 }
-
-// Função para mostrar o menu
-char playerName[MAX_NAME_LENGTH];
 
 // Função para capturar o nome do jogador
 void capturarNomeJogador(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_Event event;
     bool capturando = true;
     int cursorPos = 0;
-    memset(playerName, 0, sizeof(playerName));  // Limpa o nome anterior
+    memset(playerName, 0, sizeof(playerName));
 
     while (capturando) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
-                capturando = false;  // Fecha o loop em caso de quit
+                capturando = false;
             } else if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_RETURN) {
-                    capturando = false;  // Finaliza a captura com Enter
+                    capturando = false;
                 } else if (event.key.keysym.sym == SDLK_BACKSPACE && cursorPos > 0) {
-                    playerName[--cursorPos] = '\0';  // Apaga o último caractere
-                } else if (cursorPos < MAX_NAME_LENGTH - 1) {  // Impede exceder o limite de tamanho
-                    playerName[cursorPos++] = (char)event.key.keysym.sym;  // Adiciona o caractere
-                    playerName[cursorPos] = '\0';  // Garante a terminação da string
+                    playerName[--cursorPos] = '\0';
+                } else if (cursorPos < MAX_NAME_LENGTH - 1 && event.key.keysym.sym >= SDLK_SPACE && event.key.keysym.sym <= SDLK_z) {
+                    playerName[cursorPos++] = (char)event.key.keysym.sym;
+                    playerName[cursorPos] = '\0';
                 }
             }
         }
 
-        // Limpa a tela e renderiza o nome digitado
+        // Renderização
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-        
-        SDL_Color corTexto = {255, 255, 255, 255};  // Cor branca para o texto
-        SDL_Surface *surface = TTF_RenderText_Solid(font, playerName, corTexto);
-        if (surface == NULL) {
-            //printf("Erro ao criar a superfície do texto: %s\n", TTF_GetError());
-            continue;
+
+        // Campo de entrada
+        SDL_Rect inputFieldRect = {200, 200, 400, 100};
+        SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
+        SDL_RenderFillRect(renderer, &inputFieldRect);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDrawRect(renderer, &inputFieldRect);
+
+        // Texto de instrução
+        SDL_Surface *instrucaoSurface = TTF_RenderText_Solid(font, "Digite seu nome e pressione Enter:", corBranca);
+        if (instrucaoSurface) {
+            SDL_Texture *instrucaoTexture = SDL_CreateTextureFromSurface(renderer, instrucaoSurface);
+            SDL_FreeSurface(instrucaoSurface);
+            if (instrucaoTexture) {
+                int instrucaoWidth, instrucaoHeight;
+                SDL_QueryTexture(instrucaoTexture, NULL, NULL, &instrucaoWidth, &instrucaoHeight);
+                SDL_Rect instrucaoRect = {200, 150, instrucaoWidth, instrucaoHeight};
+                SDL_RenderCopy(renderer, instrucaoTexture, NULL, &instrucaoRect);
+                SDL_DestroyTexture(instrucaoTexture);
+            }
         }
 
-        SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-        if (texture == NULL) {
-            //printf("Erro ao criar a textura do texto: %s\n", SDL_GetError());
+        // Renderizar o texto digitado
+        SDL_Surface *surface = TTF_RenderText_Solid(font, playerName, corBranca);
+        if (surface) {
+            SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
             SDL_FreeSurface(surface);
-            continue;
+            if (texture) {
+                int textWidth, textHeight;
+                SDL_QueryTexture(texture, NULL, NULL, &textWidth, &textHeight);
+                SDL_Rect textRect = {
+                    inputFieldRect.x + (inputFieldRect.w - textWidth) / 2,
+                    inputFieldRect.y + (inputFieldRect.h - textHeight) / 2,
+                    textWidth, textHeight
+                };
+                SDL_RenderCopy(renderer, texture, NULL, &textRect);
+                SDL_DestroyTexture(texture);
+            }
         }
 
-        int textWidth = surface->w;
-        int textHeight = surface->h;
-        SDL_Rect textRect = {
-            (800 - textWidth) / 2,  // Centraliza horizontalmente na tela
-            100,                    // Posição vertical fixa
-            textWidth, textHeight
-        };
-
-        SDL_RenderCopy(renderer, texture, NULL, &textRect);
         SDL_RenderPresent(renderer);
-
-        SDL_FreeSurface(surface);
-        SDL_DestroyTexture(texture);
     }
 }
 
 
+// Função para mostrar o menu
 bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
     extern bool noMenu;
     extern bool running;
     extern SDL_Event event;
 
-    // Calculando a posição do botão centralizado
-    int botaoLargura = 200;
-    int botaoAltura = 50;
+    int botaoLargura = 200, botaoAltura = 50;
 
-    // Botões centralizados
     Botao botaoJogar = {
         {CENTER_WIDTH - botaoLargura / 2, CENTER_HEIGHT - 100, botaoLargura, botaoAltura},
-        {0, 255, 0, 255}, 
-        "Jogar"
+        corBotao, "Jogar"
     };
 
     Botao botaoInstrucoes = {
         {CENTER_WIDTH - botaoLargura / 2, CENTER_HEIGHT, botaoLargura, botaoAltura},
-        {255, 255, 0, 255}, 
-        "Comandos"
+        corAmarela, "Comandos"
     };
 
     Botao botaoSair = {
         {CENTER_WIDTH - botaoLargura / 2, CENTER_HEIGHT + 100, botaoLargura, botaoAltura},
-        {255, 0, 0, 255}, 
-        "Sair"
+        corVermelha, "Sair"
     };
 
     while (noMenu) {
@@ -156,6 +167,7 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
 
     return noMenu;
 }
+
 // Função para renderizar texto
 void renderizarTexto(SDL_Renderer *renderer, TTF_Font *font, Texto *texto) {
     SDL_Surface *surface = TTF_RenderText_Solid(font, texto->texto, texto->cor);
