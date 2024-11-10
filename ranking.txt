@@ -7,7 +7,7 @@ Jogador: paaaaa | Pontuação: 3 | Data e Hora: 2024-11-10 02:33:30
 Jogador: pedro | Pontuação: 4 | Data e Hora: 2024-11-10 02:40:12
 Jogador: pitomba | Pontuação: 12 | Data e Hora: 2024-11-10 02:40:43
 Jogador: miguel | Pontuação: 7 | Data e Hora: 2024-11-10 15:05:14
-Jogador: ]]] | Pontuação: 9 | Data e Hora: 2024-11-10 15:31:25
+Jogador:  | Pontuação: 9 | Data e Hora: 2024-11-10 15:31:25
 Jogador: aaa | Pontuação: 6 | Data e Hora: 2024-11-10 15:32:31
 Jogador: aaa | Pontuação: 11 | Data e Hora: 2024-11-10 15:37:48
 Jogador: aaa | Pontuação: 8 | Data e Hora: 2024-11-10 15:45:30
@@ -19,6 +19,6 @@ Jogador: aaaaa | Pontuação: 6 | Data e Hora: 2024-11-10 16:14:28
 Jogador: aaaaaaa | Pontuação: 3 | Data e Hora: 2024-11-10 16:15:08
 Jogador: aaaaa | Pontuação: 4 | Data e Hora: 2024-11-10 16:15:28
 Jogador: aaaaa | Pontuação: 4 | Data e Hora: 2024-11-10 16:15:54
-Jogador: al� | Pontuação: 4 | Data e Hora: 2024-11-10 18:40:56
+Jogador: al� | Pontuação: 4 | Data e Hora: 2024-11-10 18:40:56
 Jogador:  | Pontuação: 4 | Data e Hora: 2024-11-10 18:54:31
 Jogador:  | Pontuação: 4 | Data e Hora: 2024-11-10 18:54:46

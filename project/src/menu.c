@@ -64,48 +64,53 @@ void capturarNomeJogador(SDL_Renderer *renderer, TTF_Font *font) {
             }
         }
 
+        // Renderização
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
+        // Campo de entrada
         SDL_Rect inputFieldRect = {200, 200, 400, 100};
         SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
         SDL_RenderFillRect(renderer, &inputFieldRect);
-
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderDrawRect(renderer, &inputFieldRect);
 
+        // Texto de instrução
         SDL_Surface *instrucaoSurface = TTF_RenderText_Solid(font, "Digite seu nome e pressione Enter:", corBranca);
-        if (!instrucaoSurface) return;
-        SDL_Texture *instrucaoTexture = SDL_CreateTextureFromSurface(renderer, instrucaoSurface);
-        SDL_FreeSurface(instrucaoSurface);
-        if (!instrucaoTexture) return;
+        if (instrucaoSurface) {
+            SDL_Texture *instrucaoTexture = SDL_CreateTextureFromSurface(renderer, instrucaoSurface);
+            SDL_FreeSurface(instrucaoSurface);
+            if (instrucaoTexture) {
+                int instrucaoWidth, instrucaoHeight;
+                SDL_QueryTexture(instrucaoTexture, NULL, NULL, &instrucaoWidth, &instrucaoHeight);
+                SDL_Rect instrucaoRect = {200, 150, instrucaoWidth, instrucaoHeight};
+                SDL_RenderCopy(renderer, instrucaoTexture, NULL, &instrucaoRect);
+                SDL_DestroyTexture(instrucaoTexture);
+            }
+        }
 
-        int instrucaoWidth, instrucaoHeight;
-        SDL_QueryTexture(instrucaoTexture, NULL, NULL, &instrucaoWidth, &instrucaoHeight);
-        SDL_Rect instrucaoRect = {200, 150, instrucaoWidth, instrucaoHeight};
-        SDL_RenderCopy(renderer, instrucaoTexture, NULL, &instrucaoRect);
-        SDL_DestroyTexture(instrucaoTexture);
-
+        // Renderizar o texto digitado
         SDL_Surface *surface = TTF_RenderText_Solid(font, playerName, corBranca);
-        if (!surface) return;
-        SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_FreeSurface(surface);
-        if (!texture) return;
-
-        int textWidth, textHeight;
-        SDL_QueryTexture(texture, NULL, NULL, &textWidth, &textHeight);
-        SDL_Rect textRect = {
-            inputFieldRect.x + (inputFieldRect.w - textWidth) / 2,
-            inputFieldRect.y + (inputFieldRect.h - textHeight) / 2,
-            textWidth, textHeight
-        };
-
-        SDL_RenderCopy(renderer, texture, NULL, &textRect);
-        SDL_DestroyTexture(texture);
+        if (surface) {
+            SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+            SDL_FreeSurface(surface);
+            if (texture) {
+                int textWidth, textHeight;
+                SDL_QueryTexture(texture, NULL, NULL, &textWidth, &textHeight);
+                SDL_Rect textRect = {
+                    inputFieldRect.x + (inputFieldRect.w - textWidth) / 2,
+                    inputFieldRect.y + (inputFieldRect.h - textHeight) / 2,
+                    textWidth, textHeight
+                };
+                SDL_RenderCopy(renderer, texture, NULL, &textRect);
+                SDL_DestroyTexture(texture);
+            }
+        }
 
         SDL_RenderPresent(renderer);
     }
 }
+
 
 // Função para mostrar o menu
 bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
