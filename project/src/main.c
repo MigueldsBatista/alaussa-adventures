@@ -11,8 +11,9 @@
 #include "game.h"
 #include "sprite.h"
 #include "utils.h"
-#include "enemy.h"
-#include "player.h"
+#include "enemy.h"  // Inclusão do arquivo de inimigos
+#include "player.h" // Inclusão do arquivo de jogador
+#include "menupause.h"
 
 bool noMenu = true;
 bool running = true;
@@ -85,14 +86,15 @@ int main(int argc, char* argv[]) {
             while (SDL_PollEvent(&event)) {
                 if (event.type == SDL_QUIT) {
                     running = false;
-                } else if (event.type == SDL_KEYDOWN) {
-                    if (event.key.keysym.sym == SDLK_p) {
-                        printf("Jogo pausado. Pressione P para despausar.\n");
-                        bool paused = true;
-                        while (paused) {
-                            while (SDL_PollEvent(&event)) {
-                                if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
-                                    paused = false;
+                } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
+                    printf("Jogo pausado. Pressione P para despausar.\n");
+                    bool paused = true;
+                    while (paused) {
+                        while (SDL_PollEvent(&event)) {
+                            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
+                                paused = false;
+                                if(paused){
+                                    verificarPausa(renderer, font);
                                 }
                             }
                         }
