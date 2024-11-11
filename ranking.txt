@@ -11,4 +11,5 @@ Jogador: tico5 | Pontos: 13 | Data e Hora: 2024-11-10 23:59:29
 Jogador: ticomia6 | Pontos: 13 | Data e Hora: 2024-11-11 00:03:35
 Jogador: tico6 | Pontos: 14 | Data e Hora: 2024-11-11 00:00:29
 Jogador: ticomia7 | Pontos: 14 | Data e Hora: 2024-11-11 00:04:35
-Jogador: tico7 | Pontos: 15 | Data e Hora: 2024-11-11 00:01:29
+Jogador: tico7 | Pontos: 15 | Data e Hora: 2024-11-11 00:01:29Jogador: ticomiamuito | Pontos: 0 | Data e Hora: 2024-11-11 08:56:40
+Jogador: pdoasdka | Pontos: 3144 | Data e Hora: 2024-11-11 09:07:06
