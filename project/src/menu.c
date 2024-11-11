@@ -134,18 +134,33 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
     TTF_Font *tituloFont = TTF_OpenFont("project/assets/fontes/Open-Sans.ttf", 80);
     if (!tituloFont) {
         printf("Erro ao carregar a fonte do título: %s\n", TTF_GetError());
-        return false; // Retorna false se a fonte do título não puder ser carregada
+        return false;
+    }
+    TTF_Font *subTituloFont = TTF_OpenFont("project/assets/fontes/Open-Sans.ttf", 40);
+    if (!subTituloFont) {
+        printf("Erro ao carregar a fonte do título: %s\n", TTF_GetError());
+        return false; 
     }
 
     // Título do jogo
-    const char *titulo = "Super Mario Inspired Game";
-    SDL_Color corTitulo = {255, 255, 255, 255};  // Cor branca para o título
+    const char *titulo = "Aventuras de La Ursa:";
+    SDL_Color corTitulo = {0, 0, 0, 0}; 
 
+    const char *subTitulo = "Corrida pelo ouro";
+    SDL_Color corSubTitulo = {0, 0, 0, 0};  
+    
     // Renderiza o título em uma superfície
     SDL_Surface *tituloSurface = TTF_RenderText_Solid(tituloFont, titulo, corTitulo);
     if (!tituloSurface) {
         printf("Erro ao criar a superfície do título: %s\n", TTF_GetError());
         TTF_CloseFont(tituloFont);
+        return false;
+    }
+
+    SDL_Surface *subTituloSurface = TTF_RenderText_Solid(subTituloFont, subTitulo, corSubTitulo);
+    if (!subTituloSurface) {
+        printf("Erro ao criar a superfície do título: %s\n", TTF_GetError());
+        TTF_CloseFont(subTituloFont);
         return false;
     }
 
@@ -157,36 +172,55 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
         TTF_CloseFont(tituloFont);
         return false;
     }
+    SDL_Texture *subTituloTexture = SDL_CreateTextureFromSurface(renderer, subTituloSurface);
+    if (!subTituloTexture) {
+        printf("Erro ao criar a textura do título: %s\n", SDL_GetError());
+        SDL_FreeSurface(subTituloSurface);
+        TTF_CloseFont(subTituloFont);
+        return false;
+    }
 
-    int tituloLargura, tituloAltura;
+    int tituloLargura, tituloAltura, subTituloLargura, subTituloAltura;
     SDL_QueryTexture(tituloTexture, NULL, NULL, &tituloLargura, &tituloAltura);
+    SDL_QueryTexture(subTituloTexture, NULL,NULL, &subTituloLargura, &subTituloAltura);
 
-    SDL_Rect tituloRect = {
-        CENTER_WIDTH - tituloLargura / 2,
-        50,  // Posição no topo da tela
-        tituloLargura,
-        tituloAltura
-    };
+    SDL_Rect tituloRect = {250, 100, tituloLargura,tituloAltura};
+
+    SDL_Rect subTituloRect = {475, 250, subTituloLargura,subTituloAltura};
 
     Botao botaoJogar = {
-        {CENTER_WIDTH - botaoLargura / 2, CENTER_HEIGHT - 100, botaoLargura, botaoAltura},
+        {550, CENTER_HEIGHT - 150, botaoLargura, botaoAltura},
         corBotao, "Jogar"
     };
 
     Botao botaoInstrucoes = {
-        {CENTER_WIDTH - botaoLargura / 2, CENTER_HEIGHT, botaoLargura, botaoAltura},
+        {550, CENTER_HEIGHT - 75, botaoLargura, botaoAltura},
         corAmarela, "Comandos"
     };
 
     Botao botaoRanking = {
-        {CENTER_WIDTH - botaoLargura / 2, CENTER_HEIGHT + 100, botaoLargura, botaoAltura},
+        {550, CENTER_HEIGHT, botaoLargura, botaoAltura},
         corAzul, "Ranking"
     };
 
     Botao botaoSair = {
-        {CENTER_WIDTH - botaoLargura / 2, CENTER_HEIGHT + 200, botaoLargura, botaoAltura},
+        {550, CENTER_HEIGHT+75, botaoLargura, botaoAltura},
         corVermelha, "Sair"
     };
+
+     // Carrega a textura de fundo
+    SDL_Surface *fundoSurface = IMG_Load("project/assets/images/hihihiha.png");
+    if (!fundoSurface) {
+        printf("Erro ao carregar a imagem de fundo: %s\n", IMG_GetError());
+        return false;
+    }
+    SDL_Texture *fundoTexture = SDL_CreateTextureFromSurface(renderer, fundoSurface);
+    SDL_FreeSurface(fundoSurface);
+
+    if (!fundoTexture) {
+        printf("Erro ao criar a textura de fundo: %s\n", SDL_GetError());
+        return false;
+    }
 
     while (noMenu) {
         while (SDL_PollEvent(&event)) {
@@ -212,9 +246,11 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-
+        // Renderiza o fundo
+        SDL_RenderCopy(renderer, fundoTexture, NULL, NULL);
         // Renderiza o título
         SDL_RenderCopy(renderer, tituloTexture, NULL, &tituloRect);
+        SDL_RenderCopy(renderer, subTituloTexture, NULL, &subTituloRect);
 
         renderizarBotao(renderer, &botaoJogar, font);
         renderizarBotao(renderer, &botaoInstrucoes, font);
@@ -248,58 +284,68 @@ void renderizarTexto(SDL_Renderer *renderer, TTF_Font *font, Texto *texto) {
     SDL_DestroyTexture(texture);
 }
 
-// Função para mostrar as instruções
 void mostrarInstrucoes(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_RenderClear(renderer);
 
-    // Posição inicial para o texto das instruções
-    SDL_Point posicao = {(SCREEN_WIDTH - 300) / 2, 50};  // Centraliza horizontalmente e define a posição vertical inicial
+    // Posição vertical inicial para o texto das instruções
+    int posicaoY = 50;  // Define a posição vertical inicial para o primeiro texto
     int deslocamentoY = 50;  // Espaçamento entre as linhas de instruções
 
     // Texto das instruções
+    const char *instrucoes[] = {
+        "Comandos",
+        "Mova o personagem com 'W, A, S, D' ou nas setinhas",
+        "Para pular, use 'W' ou 'Espaco'",
+        "Para sair, clique em 'Sair' no menu",
+        "Pressione 'P' para pausar o jogo",
+        "Pressione 'ESC' para voltar ao menu"
+    };
+    SDL_Color corPreta = {255, 255, 255, 255};
 
-    // Renderiza os textos
-    Texto textoInstrucoes = {posicao, corPreta, "Comandos"};
-    renderizarTexto(renderer, font, &textoInstrucoes);
-    posicao.y += deslocamentoY;
+    // Renderiza cada linha de texto centralizada
+    for (int i = 0; i < 6; i++) {
+        // Renderiza o texto para uma superfície temporária para obter suas dimensões
+        SDL_Surface *surface = TTF_RenderText_Solid(font, instrucoes[i], corPreta);
+        if (!surface) {
+            printf("Erro ao criar a superfície de texto: %s\n", TTF_GetError());
+            continue;
+        }
 
-    Texto textoMoverPersonagem = {posicao, corPreta, "Mova o personagem com 'W, A, S, D'"};
-    renderizarTexto(renderer, font, &textoMoverPersonagem);
-    posicao.y += deslocamentoY;
+        SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+        int larguraTexto = surface->w;
+        SDL_FreeSurface(surface);  // Libera a superfície após criar a textura
 
-    Texto textoPular = {posicao, corPreta, "Para pular, use 'W' ou 'Espaco'"};
-    renderizarTexto(renderer, font, &textoPular);
-    posicao.y += deslocamentoY;
+        // Define a posição centralizada para o texto
+        SDL_Rect textoRect = {
+            (SCREEN_WIDTH - larguraTexto) / 2,  // Centraliza horizontalmente
+            posicaoY,                           // Posição vertical
+            larguraTexto,
+            surface->h
+        };
 
-    Texto textoSair = {posicao, corPreta, "Para sair, clique em 'Sair' no menu"};
-    renderizarTexto(renderer, font, &textoSair);
-    posicao.y += deslocamentoY;
+        // Renderiza o texto na posição definida
+        SDL_RenderCopy(renderer, texture, NULL, &textoRect);
+        SDL_DestroyTexture(texture);  // Libera a textura após renderizá-la
 
-    Texto textoVoltar = {posicao, corPreta, "Pressione 'ESC' para voltar ao menu"};
-    renderizarTexto(renderer, font, &textoVoltar);
-    posicao.y += deslocamentoY;
-
-    Texto textoPausar = {posicao, corPreta, "Pressione 'P' para pausar o jogo"};
-    renderizarTexto(renderer, font, &textoPausar);
+        posicaoY += deslocamentoY;  // Atualiza a posição vertical para a próxima linha
+    }
 
     SDL_RenderPresent(renderer);
 
+    // Loop de evento para manter a tela de instruções ativa
     bool instrucoesAtivas = true;
     SDL_Event event;
-
-    // Espera pela interação do usuário
     while (instrucoesAtivas) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 instrucoesAtivas = false;
-            } else if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_ESCAPE) {
-                    instrucoesAtivas = false;  // Fecha as instruções quando pressionado ESC
-                }
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
+                instrucoesAtivas = false;  // Fecha as instruções quando pressionado ESC
             }
         }
     }
 }
+
 
 
 // Função para mostrar a tela de game over
@@ -455,7 +501,6 @@ void mostrarRanking(SDL_Renderer *renderer, TTF_Font *font) {
 
     char linha[256];
     int deslocamentoY = 30;  // Espaçamento entre as linhas do ranking
-    int cont = 0;
 
     // Estrutura para armazenar as informações dos jogadores
     typedef struct {
