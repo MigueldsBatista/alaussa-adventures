@@ -118,7 +118,7 @@ void gameLoop(SDL_Renderer* renderer, TTF_Font* font) {
         // Simula o movimento da câmera
 
         // Controla a taxa de quadros (60 FPS)
-        SDL_Delay(16);
+        SDL_Delay(20);
     }
    
 

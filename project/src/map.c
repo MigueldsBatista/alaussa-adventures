@@ -153,7 +153,7 @@ bool checkEntityBlockCollision(Entity *player) {
 
 
 void checkMapTransition(Entity *player, SDL_Renderer *renderer) {
-    static int currentMap = 0;
+static int currentMap = 0;
     char mapFile[256];
 
     if (player->position.x + player->width >= SCREEN_WIDTH) {
@@ -170,6 +170,8 @@ void checkMapTransition(Entity *player, SDL_Renderer *renderer) {
       //  player->position.x = SCREEN_WIDTH - player->width; // Reseta a posição do jogador para o final do mapa anterior
        // freeEnemyList();
     //}
+    
+    if(player->isAlive==false)currentMap=0;
 
     renderMap(renderer);
 }

@@ -271,15 +271,15 @@ void showGameOverScreen(SDL_Renderer *renderer, TTF_Font *font) {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
                 if (SDL_PointInRect(&(SDL_Point){x, y}, &botaoRestart.rect)) {
-                    shutdownGame(); // Limpa a memória alocada
                     gameOver = false;
                     noMenu=true;
+                    shutdownGame(); // Limpa a memória alocada
                 }
             }
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        //SDL_RenderClear(renderer);
+        SDL_RenderClear(renderer);
 
         // Botão centralizado com texto "Game Over"
         Botao botaoFinish = {

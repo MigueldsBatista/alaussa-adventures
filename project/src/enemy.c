@@ -8,11 +8,11 @@
 EnemyList enemyList = { .enemyCount = 0 };
 
 void moveEnemyLeft(Entity *entity) {
-    entity->position.velX = -25.0;
+    entity->position.velX = -12.5;
 }
 
 void moveEnemyRight(Entity *entity) {
-    entity->position.velX = 25.0;
+    entity->position.velX = 12.5;
 }
 
 void addEnemy(int x, int y, SDL_Renderer *renderer) {
@@ -51,23 +51,28 @@ void updateEnemies(SDL_Renderer *renderer) {
         }
         // ↑ esse codigo de cima é pra caso o inimigo esteja fora do chão aplicar a gravidade e essas coisas
         // Movimento
+if (enemy->position.onGround) {
+    // Se o inimigo estiver parado, começa movendo para a esquerda
+    if (enemy->position.velX == 0) {
+        moveEnemyLeft(enemy);
+    }
 
-        if (enemy->position.onGround) {
-            if (enemy->position.velX == 0 && checkEntityBlockCollision(enemy) == false) {
-                moveEnemyLeft(enemy);
-            }
+    // Verifica colisão com blocos e inverte a direção
+    if (checkEntityBlockCollision(enemy)) {
+        // Inverte a direção horizontal ao colidir
+        enemy->position.velX = -enemy->position.velX;
 
-            if (checkEntityBlockCollision(enemy)) {
-                if (enemy->position.velX > 0) {
-                    moveEnemyLeft(enemy);
-                } 
-                else {
-                    moveEnemyRight(enemy);
-                }
-            }
-            
-        checkPlatformEdge(enemy);
+        // Atualiza a direção com base na nova velocidade
+        if (enemy->position.velX > 0) {
+            moveEnemyRight(enemy);
+        } else if(enemy->position.velX < 0) {
+            moveEnemyLeft(enemy);
         }
+    }
+
+    // Verifica a borda da plataforma e inverte a direção, se necessário
+    checkPlatformEdge(enemy);
+}
 
         // Atualiza a posição horizontal do inimigo
         enemy->position.x += enemy->position.velX * DELTA_TIME;
