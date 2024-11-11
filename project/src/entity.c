@@ -271,7 +271,7 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) 
 }
 void jumpEntity(Entity *entity) {
     if (entity->position.onGround) {
-        entity->position.velY = -300;
+        entity->position.velY = -300.0;
         entity->position.onGround = false;
     }
 }
