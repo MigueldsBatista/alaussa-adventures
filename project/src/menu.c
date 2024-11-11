@@ -431,13 +431,16 @@ void mostrarRanking(SDL_Renderer *renderer, TTF_Font *font) {
         }
     }
 
+    int posicaoRanking = 1;
+
     // Renderiza os jogadores ordenados
     for (int i = 0; i < numJogadores && i < 10; i++) {
         char texto[256];
-        snprintf(texto, sizeof(texto), "Jogador: %s | Pontos: %d | Data e Hora: %s", jogadores[i].nome, jogadores[i].pontos, jogadores[i].dataHora);
+        snprintf(texto, sizeof(texto), " %d  Jogador: %s | Pontos: %d | Data e Hora: %s", posicaoRanking, jogadores[i].nome, jogadores[i].pontos, jogadores[i].dataHora);
         Texto textoRanking = {posicao, corBranca, texto};
         renderizarTexto(renderer, font, &textoRanking);
         posicao.y += deslocamentoY;
+        posicaoRanking++;
     }
 
     while (fgets(linha, sizeof(linha), file)) {
