@@ -26,7 +26,7 @@ void showGameOverScreen(SDL_Renderer* renderer, TTF_Font* font);
 bool mostrarMenu(SDL_Renderer* renderer, TTF_Font* font);
 
 void mostrarMenuPausa(SDL_Renderer *renderer, TTF_Font *font);
-
+void mostrarRanking(SDL_Renderer *renderer, TTF_Font *font);
 void mostrarMenuFimDeJogo(SDL_Renderer *renderer, TTF_Font *font);
 void capturarNomeJogador(SDL_Renderer *renderer, TTF_Font *font);
 

@@ -19,3 +19,4 @@ SDL_Texture* loadImage(const char* filename, SDL_Renderer* renderer){
     }
     return texture;
 }
+

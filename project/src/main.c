@@ -21,8 +21,6 @@ bool paused = false;
 SDL_Renderer* renderer;
 SDL_Event event;
 
-
-
 int main(int argc, char* argv[]) {
     // Inicialização do SDL e módulos
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {

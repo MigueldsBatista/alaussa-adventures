@@ -49,7 +49,7 @@ void writePlayerInfo(Entity *player, const char* playerName) {
     strftime(dateTime, sizeof(dateTime)-1, "%Y-%m-%d %H:%M:%S", t);
 
     // Escrevendo as informações do jogador no arquivo
-    fprintf(file, "Jogador: %s | Pontuação: %d | Data e Hora: %s\n", playerName, player->moedas, dateTime);
+    fprintf(file, "Jogador: %s | Pontos: %d | Data e Hora: %s\n", playerName, player->moedas, dateTime);
 
     // Fechando o arquivo
     fclose(file);

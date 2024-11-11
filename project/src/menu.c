@@ -131,8 +131,13 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
         corAmarela, "Comandos"
     };
 
-    Botao botaoSair = {
+    Botao botaoRanking = {
         {CENTER_WIDTH - botaoLargura / 2, CENTER_HEIGHT + 100, botaoLargura, botaoAltura},
+        corAzul, "Ranking"
+    };
+
+    Botao botaoSair = {
+        {CENTER_WIDTH - botaoLargura / 2, CENTER_HEIGHT + 200, botaoLargura, botaoAltura},
         corVermelha, "Sair"
     };
 
@@ -149,6 +154,8 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
                     noMenu = false;
                 } else if (SDL_PointInRect(&(SDL_Point){x, y}, &botaoInstrucoes.rect)) {
                     mostrarInstrucoes(renderer, font);
+                } else if(SDL_PointInRect(&(SDL_Point){x, y}, &botaoRanking.rect)){
+                    mostrarRanking(renderer,font);
                 } else if (SDL_PointInRect(&(SDL_Point){x, y}, &botaoSair.rect)) {
                     noMenu = false;
                     running = false;
@@ -161,6 +168,7 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
 
         renderizarBotao(renderer, &botaoJogar, font);
         renderizarBotao(renderer, &botaoInstrucoes, font);
+        renderizarBotao(renderer,&botaoRanking,font);
         renderizarBotao(renderer, &botaoSair, font);
 
         SDL_RenderPresent(renderer);
@@ -377,5 +385,85 @@ void mostrarMenuFimDeJogo(SDL_Renderer *renderer, TTF_Font *font) {
         renderizarBotao(renderer, &botaoRestart, font);
 
         SDL_RenderPresent(renderer);
+    }
+}
+
+// Função para mostrar o ranking
+void mostrarRanking(SDL_Renderer *renderer, TTF_Font *font) {
+    SDL_RenderClear(renderer);
+
+    FILE *file = fopen("ranking.txt", "r");
+    if (!file) {
+        printf("Erro ao abrir o arquivo de ranking.\n");
+        return;
+    }
+
+
+    char linha[256];
+    SDL_Point posicao = {100, 50};  // Posição inicial para o texto do ranking
+    int deslocamentoY = 30;  // Espaçamento entre as linhas do ranking
+    int cont = 0;
+
+    // Estrutura para armazenar as informações dos jogadores
+    typedef struct {
+        char nome[50];
+        int pontos;
+        char dataHora[100];
+    } Jogador;
+
+    Jogador jogadores[100];
+    int numJogadores = 0;
+
+    // Lê as informações do arquivo e armazena na estrutura
+    while (fgets(linha, sizeof(linha), file)) {
+        sscanf(linha, "Jogador: %[^|]| Pontos: %d | Data e Hora: %[^\n]", jogadores[numJogadores].nome, &jogadores[numJogadores].pontos, jogadores[numJogadores].dataHora);
+        numJogadores++;
+    }
+
+    // Ordena os jogadores por pontuação (maior para menor)
+    for (int i = 0; i < numJogadores - 1; i++) {
+        for (int j = i + 1; j < numJogadores; j++) {
+            if (jogadores[i].pontos < jogadores[j].pontos) {
+                Jogador temp = jogadores[i];
+                jogadores[i] = jogadores[j];
+                jogadores[j] = temp;
+            }
+        }
+    }
+
+    // Renderiza os jogadores ordenados
+    for (int i = 0; i < numJogadores && i < 10; i++) {
+        char texto[256];
+        snprintf(texto, sizeof(texto), "Jogador: %s | Pontos: %d | Data e Hora: %s", jogadores[i].nome, jogadores[i].pontos, jogadores[i].dataHora);
+        Texto textoRanking = {posicao, corBranca, texto};
+        renderizarTexto(renderer, font, &textoRanking);
+        posicao.y += deslocamentoY;
+    }
+
+    while (fgets(linha, sizeof(linha), file)) {
+        Texto textoRanking = {posicao, corBranca, linha};
+        renderizarTexto(renderer, font, &textoRanking);
+        posicao.y += deslocamentoY;
+        cont++;
+        if (cont >= 10) break;
+    }
+
+    fclose(file);
+    SDL_RenderPresent(renderer);
+
+    bool rankingAtivo = true;
+    SDL_Event event;
+
+    // Espera pela interação do usuário
+    while (rankingAtivo) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                rankingAtivo = false;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_ESCAPE) {
+                    rankingAtivo = false;  // Fecha o ranking quando pressionado ESC
+                }
+            }
+        }
     }
 }
