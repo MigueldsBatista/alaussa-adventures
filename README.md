@@ -6,7 +6,7 @@
 - [Créditos](#créditos)
 
 ## Descrição
-A La Ursa quer dinheiro quem não dá é pirangueiro! Nosso jogo é baseado em Super Mario Brothers, com a diferença que, como o jingle fala, a La Ursa quer dinheiro. Assim, o objetivo é coletar o máximo de moedas possíveis, completando vários parkours e chegando ao ponto de chegada marcado pela Iconica Torre de cristal.
+A La Ursa quer dinheiro quem não dá é pirangueiro! Nosso jogo é baseado em Super Mario Brothers, com a diferença que, como o jingle fala, a La Ursa quer dinheiro. Assim, o objetivo é coletar o máximo de moedas possíveis, completando vários parkours e chegando ao ponto de chegada marcado pela icônica Torre de cristal.
 
 ## Instalação
 ### Pré-requisitos
