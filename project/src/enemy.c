@@ -116,7 +116,7 @@ void checkPlayerEnemyCollision(Entity *player, EnemyList *enemyList) {
             }
             // Verifica se o jogador caiu em cima do inimigo
             if (playerRect.y + playerRect.h >= enemyRect.y && playerRect.y + playerRect.h < enemyRect.y + enemyRect.h / 2 && player->position.velY >= 0) {
-                player->moedas=player->moedas*2;
+                player->moedas=player->moedas+500;
                 free(enemyList->enemies[i]);  // Libera a memória do inimigo atual
                 // Remove o inimigo da lista, reorganizando o array
                 for (int j = i; j < enemyList->enemyCount - 1; j++) {
