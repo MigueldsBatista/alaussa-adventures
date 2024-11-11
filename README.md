@@ -1,52 +1,60 @@
-# SnakeGame - Projeto de PIF do 2º Período
+# Aventuras de La Ursa: Caça às Moedas - Projeto de AED do 3º Período
 
 - [Descrição](#descrição)
 - [Instalação](#instalação)
 - [Controles](#controles)
-- [Funcionalidades Extras](#funcionalidades-extras)
 - [Créditos](#créditos)
 
 ## Descrição
-Um clássico jogo da cobrinha desenvolvido em C com funcionalidades extras. O objetivo é guiar a cobra pelo tabuleiro para comer frutas que aparecem aleatoriamente. Cada fruta consumida faz a cobra crescer, aumentando a dificuldade do jogo. O jogo termina se a cobra colidir com as paredes. Você pode competir com seus amigos para ver quem consegue a maior pontuação! Cada vez que você joga, sua pontuação é registrada em um ranking. Teste seus reflexos, desafie seus amigos e veja quanto tempo você consegue sobreviver enquanto a cobra continua a crescer! 
+A La Ursa quer dinheiro quem não dá é pirangueiro! Nosso jogo é baseado em Super Mario Brothers, com a diferença que, como o jingle fala, a La Ursa quer dinheiro. Assim, o objetivo é coletar o máximo de moedas possíveis, completando vários parkours e chegando ao ponto de chegada marcado pela Iconica Torre de cristal.
 
 ## Instalação
 ### Pré-requisitos
 - [Compilador C](https://gcc.gnu.org/)
-- [Biblioteca ncurses](https://invisible-island.net/ncurses/) (necessária para manipulação de tela no terminal)
+- Maquina Virtual Linux ou o próprio Linux
+- [baixar as bibliotecas de requirements.txt](https://github.com/xTvini/JogoAED/blob/main/requirements.txt)
 
 ### Compilação
 1. Clone este repositório:
     ```sh
-    git clone https://github.com/xTvini/snakegame.git
+    git clone https://github.com/xTvini/JogoAED.git
     ```
 2. Navegue até o diretório do projeto:
+caso tenha criado alguma pasta entre na pasta onde está clonado nosso GIT
     ```sh
-    cd snakegame
-    cd snake
+    cd 'nome_da_sua_pasta'
     ```
-3. Compile o código:
-    ```sh
-    gcc -I./include src/*.c -o main
+4. Compile o código:
+digite o comando 'make' para assim compilar tudo e criar todos os executaveis
+   ```sh
+   make
     ```
     
 ### Execução
 Para jogar, execute o arquivo compilado:
 ```sh
-./main
+./jogo
+```
+### Finalização
+Para deletar os executaveis e os arquivos que foi criado com o 'make' dê 'make clean'
+```sh
+make clean
 ```
 
 ## Controles
-- **Tecla W**: Mover para cima
-- **Tecla S**: Mover para baixo
+- **Tecla W**: Pular
 - **Tecla A**: Mover para a esquerda
 - **Tecla D**: Mover para a direita
-- **Tecla ESC**: Sair do jogo
-
-## Funcionalidades Extras
-- **Níveis de dificuldade**: Escolha entre fácil, médio e difícil, ajustando a velocidade da cobra.
-- **Inversão da cobra**: Sempre que a cobra pega uma fruta, ela inverte, trocando a cabeça pelo rabo e o rabo pela cabeça, e a direção do movimento também se inverte. Por exemplo, se a cobra pegar uma fruta enquanto está se movendo para cima, ela começará a se mover para baixo após a inversão.
+- **Barra De Espaço**: Pular
+- **Seta Pra Cima**: pular
+- **Seta Pra Esquerda**: Mover para a esquerda
+- **Seta Pra Direita**: Mover para a direita
+- **Tecla P**: pause
 
 ## Créditos
-- **Kauane Melo** - [KauaneMelo](https://github.com/KauaneMelo)
-- **Maria Fernanda Ordonho** - [nandaord](https://github.com/nandaord)
+- **Miguel Batista** - [MigueldsBatista](https://github.com/MigueldsBatista)
+- **Tiago Gurgel** - [tgafa](https://github.com/tgafa)
 - **Vinícius Diniz** - [xTvini](https://github.com/xTvini)
+- **Miguel Becker** - [Becker1406](https://github.com/Becker1406)
+- **Rafael Barros** - [raf7525](https://github.com/raf7525)
+- **José Braz** - [jbraz05](https://github.com/jbraz05)
