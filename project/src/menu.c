@@ -69,14 +69,18 @@ void capturarNomeJogador(SDL_Renderer *renderer, TTF_Font *font) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        // Campo de entrada
-        SDL_Rect inputFieldRect = {200, 200, 400, 100};
+        // Campo de entrada centralizado
+        SDL_Rect inputFieldRect = {
+            (SCREEN_WIDTH - 400) / 2,  // Centraliza horizontalmente
+            (SCREEN_HEIGHT - 100) / 2,  // Centraliza verticalmente
+            400, 100
+        };
         SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
         SDL_RenderFillRect(renderer, &inputFieldRect);
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderDrawRect(renderer, &inputFieldRect);
 
-        // Texto de instrução
+        // Texto de instrução centralizado
         SDL_Surface *instrucaoSurface = TTF_RenderText_Solid(font, "Digite seu nome e pressione Enter:", corBranca);
         if (instrucaoSurface) {
             SDL_Texture *instrucaoTexture = SDL_CreateTextureFromSurface(renderer, instrucaoSurface);
@@ -84,7 +88,12 @@ void capturarNomeJogador(SDL_Renderer *renderer, TTF_Font *font) {
             if (instrucaoTexture) {
                 int instrucaoWidth, instrucaoHeight;
                 SDL_QueryTexture(instrucaoTexture, NULL, NULL, &instrucaoWidth, &instrucaoHeight);
-                SDL_Rect instrucaoRect = {200, 150, instrucaoWidth, instrucaoHeight};
+                SDL_Rect instrucaoRect = {
+                    (SCREEN_WIDTH - instrucaoWidth) / 2,  // Centraliza horizontalmente
+                    (SCREEN_HEIGHT - 100) / 2 - 50,       // Posiciona um pouco acima do campo de entrada
+                    instrucaoWidth,
+                    instrucaoHeight
+                };
                 SDL_RenderCopy(renderer, instrucaoTexture, NULL, &instrucaoRect);
                 SDL_DestroyTexture(instrucaoTexture);
             }
@@ -113,13 +122,51 @@ void capturarNomeJogador(SDL_Renderer *renderer, TTF_Font *font) {
 }
 
 
-// Função para mostrar o menu
+
 bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
     extern bool noMenu;
     extern bool running;
     extern SDL_Event event;
 
     int botaoLargura = 200, botaoAltura = 50;
+
+    // Carrega a fonte para o título com tamanho grande
+    TTF_Font *tituloFont = TTF_OpenFont("project/assets/fontes/Open-Sans.ttf", 80);
+    if (!tituloFont) {
+        printf("Erro ao carregar a fonte do título: %s\n", TTF_GetError());
+        return false; // Retorna false se a fonte do título não puder ser carregada
+    }
+
+    // Título do jogo
+    const char *titulo = "Super Mario Inspired Game";
+    SDL_Color corTitulo = {255, 255, 255, 255};  // Cor branca para o título
+
+    // Renderiza o título em uma superfície
+    SDL_Surface *tituloSurface = TTF_RenderText_Solid(tituloFont, titulo, corTitulo);
+    if (!tituloSurface) {
+        printf("Erro ao criar a superfície do título: %s\n", TTF_GetError());
+        TTF_CloseFont(tituloFont);
+        return false;
+    }
+
+    // Cria uma textura a partir da superfície do título
+    SDL_Texture *tituloTexture = SDL_CreateTextureFromSurface(renderer, tituloSurface);
+    if (!tituloTexture) {
+        printf("Erro ao criar a textura do título: %s\n", SDL_GetError());
+        SDL_FreeSurface(tituloSurface);
+        TTF_CloseFont(tituloFont);
+        return false;
+    }
+
+    int tituloLargura, tituloAltura;
+    SDL_QueryTexture(tituloTexture, NULL, NULL, &tituloLargura, &tituloAltura);
+
+    SDL_Rect tituloRect = {
+        CENTER_WIDTH - tituloLargura / 2,
+        50,  // Posição no topo da tela
+        tituloLargura,
+        tituloAltura
+    };
 
     Botao botaoJogar = {
         {CENTER_WIDTH - botaoLargura / 2, CENTER_HEIGHT - 100, botaoLargura, botaoAltura},
@@ -166,16 +213,25 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
+        // Renderiza o título
+        SDL_RenderCopy(renderer, tituloTexture, NULL, &tituloRect);
+
         renderizarBotao(renderer, &botaoJogar, font);
         renderizarBotao(renderer, &botaoInstrucoes, font);
-        renderizarBotao(renderer,&botaoRanking,font);
+        renderizarBotao(renderer, &botaoRanking, font);
         renderizarBotao(renderer, &botaoSair, font);
 
         SDL_RenderPresent(renderer);
     }
 
+    // Libera recursos do título
+    SDL_DestroyTexture(tituloTexture);
+    SDL_FreeSurface(tituloSurface);
+    TTF_CloseFont(tituloFont);
+
     return noMenu;
 }
+
 
 // Função para renderizar texto
 void renderizarTexto(SDL_Renderer *renderer, TTF_Font *font, Texto *texto) {
@@ -388,7 +444,6 @@ void mostrarMenuFimDeJogo(SDL_Renderer *renderer, TTF_Font *font) {
     }
 }
 
-// Função para mostrar o ranking
 void mostrarRanking(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_RenderClear(renderer);
 
@@ -398,9 +453,7 @@ void mostrarRanking(SDL_Renderer *renderer, TTF_Font *font) {
         return;
     }
 
-
     char linha[256];
-    SDL_Point posicao = {100, 50};  // Posição inicial para o texto do ranking
     int deslocamentoY = 30;  // Espaçamento entre as linhas do ranking
     int cont = 0;
 
@@ -432,23 +485,26 @@ void mostrarRanking(SDL_Renderer *renderer, TTF_Font *font) {
     }
 
     int posicaoRanking = 1;
+    SDL_Color corBranca = {255, 255, 255, 255};
+    SDL_Point posicaoInicial = {0, 50};  // Posição inicial para o texto do ranking, centralizado
 
-    // Renderiza os jogadores ordenados
+    // Renderiza os jogadores ordenados e centralizados
     for (int i = 0; i < numJogadores && i < 10; i++) {
         char texto[256];
         snprintf(texto, sizeof(texto), " %d  Jogador: %s | Pontos: %d | Data e Hora: %s", posicaoRanking, jogadores[i].nome, jogadores[i].pontos, jogadores[i].dataHora);
-        Texto textoRanking = {posicao, corBranca, texto};
-        renderizarTexto(renderer, font, &textoRanking);
-        posicao.y += deslocamentoY;
-        posicaoRanking++;
-    }
+        
+        int textoWidth, textoHeight;
+        TTF_SizeText(font, texto, &textoWidth, &textoHeight);
 
-    while (fgets(linha, sizeof(linha), file)) {
-        Texto textoRanking = {posicao, corBranca, linha};
+        SDL_Point posicaoCentralizada = {
+            (SCREEN_WIDTH - textoWidth) / 2,  // Centraliza horizontalmente
+            posicaoInicial.y + i * deslocamentoY  // Ajusta a posição vertical com base no índice
+        };
+
+        Texto textoRanking = {posicaoCentralizada, corBranca, texto};
         renderizarTexto(renderer, font, &textoRanking);
-        posicao.y += deslocamentoY;
-        cont++;
-        if (cont >= 10) break;
+        
+        posicaoRanking++;
     }
 
     fclose(file);
