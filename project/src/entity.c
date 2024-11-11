@@ -31,6 +31,7 @@ void initEnemy(Entity *entity, Label label, int posX, int posY, int life_quantit
     initLifeEntity(entity, life_quantity);
     loadAnimationFrames(entity, IDLE, renderer);
 }
+
 void initPlayer(Entity *entity, Label label, int posX, int posY, int life_quantity, SDL_Renderer *renderer) {
     entity->position.x = posX;
     entity->position.y = posY;
@@ -102,24 +103,46 @@ void updateEntity(Entity *entity, SDL_Renderer *renderer) {
         entity->position.onGround = true;
     }
 
-    // Prioriza a animação de dano se a imortalidade estiver ativa
-    if (entity->imortalidadeAtiva) {
-        loadAnimationFrames(entity, TAKING_DAMAGE, renderer);
-    } else if (entity->position.onGround) {
+    // Define o estado atual
+    Action newAction;
+    if (entity->imortalidadeAtiva && entity->label == PLAYER) {
+        newAction = TAKING_DAMAGE;
+    }
+    
+    else if (entity->position.onGround) {
         if (entity->position.velX == 0) {
-            loadAnimationFrames(entity, IDLE, renderer);
+            newAction = IDLE;
         } else if (entity->position.velX > 0) {
-            loadAnimationFrames(entity, MOVE_RIGHT, renderer);
-        } else if (entity->position.velX < 0) {
-            loadAnimationFrames(entity, MOVE_LEFT, renderer);
+            newAction = MOVE_RIGHT;
+        } else {
+            newAction = MOVE_LEFT;
         }
     } else {
         if (entity->position.velX >= 0) {
-            loadAnimationFrames(entity, JUMP_RIGHT, renderer);
+            newAction = JUMP_RIGHT;
         } else {
-            loadAnimationFrames(entity, JUMP_LEFT, renderer);
+            newAction = JUMP_LEFT;
         }
     }
+
+    // Carrega a animação apenas se o estado mudar
+    if (entity->currentAction != newAction) {
+        entity->currentAction = newAction;
+        freeAnimationFrames(entity); // Libera os quadros anteriores
+        loadAnimationFrames(entity, newAction, renderer);
+        entity->currentFrame = 0; // Reinicia o quadro da animação
+    }
+    /*
+
+    currentFrame	Após incremento	Cálculo % totalFrames	Novo currentFrame
+            0	            1	            1 % 4 → 1	            1
+            1	            2	            2 % 4 → 2	            2
+            2	            3	            3 % 4 → 3	            3
+            3	            4	            4 % 4 → 0	            0 (reinicia)
+    
+    */
+    // Atualiza o quadro da animação
+    entity->currentFrame = (entity->currentFrame + 1) % entity->totalFrames;
 }
 
 void renderEntity(Entity *entity, SDL_Renderer *renderer) {
@@ -173,23 +196,24 @@ Action handleEntityInput(SDL_Event *event, Entity *entity) {
 void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) {
     int frameCount = 0;
     
-    // Determina o número de frames com base na ação
-    if (entity->isAlive == false) {
-        frameCount = 1;
-    } else {
+
         switch (action) {
             case IDLE: 
             case TAKING_DAMAGE: frameCount = 1;
             break;
+
             case MOVE_LEFT:
-            case MOVE_RIGHT: frameCount = 3; break;
+            case MOVE_RIGHT:
+                frameCount = 3;
+                break;
+
             case JUMP_RIGHT:
             case JUMP_LEFT:
             case FALL_LEFT:
             case FALL_RIGHT: frameCount = 3; break;
             default: break;
         }
-    }
+    
 
     // Aloca memória para as texturas de animação
     entity->animationFrames = malloc(sizeof(SDL_Texture*) * frameCount);
@@ -217,14 +241,19 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) 
             else if(action == TAKING_DAMAGE) {
                 sprintf(filename, "project/assets/MovPlayer/player_damage.png");
             }
-            
-        } else if (entity->label == ENEMY) {
+
+        }
+        else if (entity->label == ENEMY) {
             // Enemy animations
             if (action == MOVE_LEFT) {
                 sprintf(filename, "project/assets/MovEnemy/enemy_move_left_%d.png", i);
             } else if (action == MOVE_RIGHT) {
                 sprintf(filename, "project/assets/MovEnemy/enemy_move_right_%d.png", i);
-            } else if (action == IDLE) {
+            }// else if (action == IDLE) {
+             //   sprintf(filename, "project/assets/MovEnemy/enemy_idle_%d.png", i);
+            //}
+            
+            else{
                 sprintf(filename, "project/assets/MovEnemy/enemy_idle_%d.png", i);
             }
         }

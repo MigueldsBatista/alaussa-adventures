@@ -16,6 +16,14 @@
 
 #define GROUND_LEVEL (SCREEN_HEIGHT - 50) // Altura do chão a 50 pixels do fundo
 
+// Estrutura de dados para o mapa
+typedef struct {
+    int width;
+    int height;
+    int tiles[MAX_MAP_HEIGHT][MAX_MAP_WIDTH]; // Exemplo de representação do mapa
+} Map;
+
+void checkPlatformEdge(Entity *enemy);
 
 /**
  * @brief Represents a block in the game map.
@@ -27,6 +35,7 @@ typedef struct {
      int type; 
      SDL_Rect rectangle; 
 }Block;
+
 
 /**
  * @brief Loads a map from a specified file.
@@ -68,6 +77,5 @@ bool checkEntityBlockCollision(Entity *player);
 void checkMapTransition(Entity *player, SDL_Renderer *renderer);
 
 bool checkPlayerInFinishPosition(Entity *player, SDL_Renderer *renderer, TTF_Font *font);
-
 
 #endif // !__MAP_H__

@@ -2,6 +2,7 @@
 #include <SDL2/SDL_ttf.h>
 #include "menu.h"
 #include "map.h"
+#include "game.h"
 
 #define MAX_NAME_LENGTH 50  // Definição do tamanho máximo para o nome do jogador
 
@@ -241,7 +242,7 @@ void mostrarInstrucoes(SDL_Renderer *renderer, TTF_Font *font) {
 void showGameOverScreen(SDL_Renderer *renderer, TTF_Font *font) {
     extern bool running;
     bool gameOver = true;
-
+    extern bool noMenu;
     // Calculando as posições centralizadas do botão
     int botaoLargura = 200;
     int botaoAltura = 50;
@@ -262,8 +263,9 @@ void showGameOverScreen(SDL_Renderer *renderer, TTF_Font *font) {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
                 if (SDL_PointInRect(&(SDL_Point){x, y}, &botaoRestart.rect)) {
+                    shutdownGame(); // Limpa a memória alocada
                     gameOver = false;
-                    running = true;
+                    noMenu=true;
                 }
             }
         }
@@ -354,6 +356,7 @@ void mostrarMenuFimDeJogo(SDL_Renderer *renderer, TTF_Font *font) {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
                 if (SDL_PointInRect(&(SDL_Point){x, y}, &botaoRestart.rect)) {
+                    shutdownGame(); // Limpa a memória alocada
                     gameOver = false;
                     running = true; // Reinicia o jogo
                     noMenu = true;  // Volta para o menu principal

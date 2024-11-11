@@ -9,20 +9,18 @@
 #include "player.h"
 #include <SDL2/SDL_ttf.h>
 
-void initGame(SDL_Renderer* renderer) {
-    // Inicializa o jogo, carregando o mapa e inimigos (se necessário)
-    loadMap("project/assets/images/parallax.png");
-}
+
+Entity player;
+SDL_Texture *background;
+
 
 void gameLoop(SDL_Renderer* renderer, TTF_Font* font) {
     Uint32 lastTime = SDL_GetTicks();
-    Entity player;
     extern bool running;
     extern bool paused;
     extern SDL_Event event;
-    int camera_position = 0;
 
-    SDL_Texture *background = loadTexture("project/assets/map/background_game.png", renderer, "background");
+    background = loadTexture("project/assets/map/background_game.png", renderer, "background");
     loadMap("project/assets/map/map_0.txt");
 
     // Inicializa o jogador
@@ -62,6 +60,7 @@ void gameLoop(SDL_Renderer* renderer, TTF_Font* font) {
         // Verificação de colisões
         checkCoinCollected(&player, renderer);
         checkPlayerEnemyCollision(&player, &enemyList);
+        checkMapTransition(&player, renderer);
 
         // Limita o jogador ao chão e às bordas da tela
         if (player.position.y + player.height >= GROUND_LEVEL) {
@@ -117,22 +116,34 @@ void gameLoop(SDL_Renderer* renderer, TTF_Font* font) {
         SDL_RenderPresent(renderer);
 
         // Simula o movimento da câmera
-        camera_position += 2;
 
         // Controla a taxa de quadros (60 FPS)
         SDL_Delay(16);
     }
+   
 
-    // Libera os recursos alocados
-    for (int i = 0; i < player.totalFrames; i++) {
-        SDL_DestroyTexture(player.animationFrames[i]);
-    }
-    free(player.animationFrames);
-    freeEnemyList();
-    SDL_DestroyTexture(background);
 }
 
 void shutdownGame() {
-    // Finaliza o jogo, liberando recursos
-    return;
+    // Libera os quadros de animação do jogador
+    for (int i = 0; i < player.totalFrames; i++) {
+        if (player.animationFrames[i] != NULL) {
+            SDL_DestroyTexture(player.animationFrames[i]);
+            player.animationFrames[i] = NULL;
+        }
+    }
+
+    // Libera a memória da animação do jogador
+    if (player.animationFrames != NULL) {
+        free(player.animationFrames);
+        player.animationFrames = NULL;
+    }
+    
+    freeEnemyList();
+ 
+    // Libera a textura de fundo
+    if (background != NULL) {
+        SDL_DestroyTexture(background);
+        background = NULL;
+    }
 }

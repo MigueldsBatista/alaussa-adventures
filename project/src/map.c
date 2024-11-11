@@ -11,15 +11,7 @@
 const float escala = 0.5; // Ajuste conforme a proporção da tela minimizada
 
 
-// Estrutura de dados para o mapa
-typedef struct {
-    int width;
-    int height;
-    int tiles[MAX_MAP_HEIGHT][MAX_MAP_WIDTH]; // Exemplo de representação do mapa
-} Map;
-
-
-Map gameMap; // Instância do mapa
+Map gameMap;
 
 void loadMap(const char* map_file) {
     //TODO: Implementar a função loadMap
@@ -141,6 +133,7 @@ bool checkEntityBlockCollision(Entity *player) {
                         player->position.velY = 0;  // Zera a velocidade vertical ao colidir por baixo
                         return true;
                     }
+
                     // Colisão lateral (ajustes de posição horizontal)
                     else if (playerRect.x + playerRect.w > blockRect.x && playerRect.x < blockRect.x) {
                         player->position.x = blockRect.x / escala - player->width;  // Ajuste suave pela esquerda
@@ -158,7 +151,7 @@ bool checkEntityBlockCollision(Entity *player) {
     return false;
 }
 
-;
+
 void checkMapTransition(Entity *player, SDL_Renderer *renderer) {
     static int currentMap = 0;
     char mapFile[256];
@@ -169,6 +162,7 @@ void checkMapTransition(Entity *player, SDL_Renderer *renderer) {
         snprintf(mapFile, sizeof(mapFile), "project/assets/map/map_%d.txt", currentMap); // Formata o nome do próximo mapa
         loadMap(mapFile); // Carrega o próximo mapa
         player->position.x = 0; // Reseta a posição do jogador para o início do novo mapa
+        printf("Mapa %d\n", currentMap);
     } //else if (player->position.x <= 0 && currentMap > 0) {
       //  currentMap--;
       //  snprintf(mapFile, sizeof(mapFile), "project/assets/map/map_%d.txt", currentMap); // Formata o nome do mapa anterior
@@ -232,4 +226,77 @@ bool checkPlayerInFinishPosition(Entity *player, SDL_Renderer *renderer, TTF_Fon
         }
     }
     return false;
+}
+
+
+void updateEnemyMovement(Entity *enemy) {
+    SDL_Rect enemyRect = {
+        (int)(enemy->position.x * escala),
+        (int)(enemy->position.y * escala),
+        (int)(enemy->width * escala),
+        (int)(enemy->height * escala)
+    };
+
+    // Verificar colisão lateral
+    for (int y = 0; y < gameMap.height; y++) {
+        for (int x = 0; x < gameMap.width; x++) {
+            if (gameMap.tiles[y][x] > 0 && gameMap.tiles[y][x] != 3) {
+                SDL_Rect blockRect = {
+                    (int)(x * 64 * escala),
+                    (int)(y * 64 * escala),
+                    (int)(64 * escala),
+                    (int)(64 * escala)
+                };
+
+                if (SDL_HasIntersection(&enemyRect, &blockRect) == SDL_TRUE) {
+                    // Colisão lateral com um bloco, inverte a direção
+                    if (enemy->position.velX > 0) {
+                        enemy->position.x = blockRect.x / escala - enemy->width;
+                    } else {
+                        enemy->position.x = (blockRect.x + blockRect.w) / escala;
+                    }
+                    enemy->position.velX *= -1; // Inverte a direção
+                }
+            }
+        }
+    }
+
+    // Verificar borda da plataforma
+    int tileBelowLeft = gameMap.tiles[(int)((enemy->position.y + enemy->height + 1) / 64)][(int)(enemy->position.x / 64)];
+    int tileBelowRight = gameMap.tiles[(int)((enemy->position.y + enemy->height + 1) / 64)][(int)((enemy->position.x + enemy->width) / 64)];
+
+    // Inverte a direção se o inimigo estiver na borda da plataforma
+    if (tileBelowLeft == 0 && enemy->position.velX < 0) {
+        enemy->position.velX *= -1;
+    } else if (tileBelowRight == 0 && enemy->position.velX > 0) {
+        enemy->position.velX *= -1;
+    }
+
+    // Atualizar a posição do inimigo
+    enemy->position.x += enemy->position.velX;
+}
+
+
+
+void checkPlatformEdge(Entity *enemy) {
+    // Cálculo do tile abaixo da borda esquerda do inimigo
+    int tileBelowLeft =
+     gameMap.tiles[(int)((enemy->position.y + enemy->height + 1) / 64)] // Calcula a linha do tile
+    [(int)(enemy->position.x / 64)]; // Calcula a coluna do tile
+
+    // Cálculo do tile abaixo da borda direita do inimigo
+    int tileBelowRight = gameMap.tiles[(int)((enemy->position.y + enemy->height + 1) / 64)] // Calcula a linha do tile
+                         [(int)((enemy->position.x + enemy->width) / 64)]; // Calcula a coluna do tile
+
+    // Verifica se não há plataforma à esquerda e o inimigo está se movendo para a esquerda
+    if (tileBelowLeft == 0 && enemy->position.velX < 0) {
+        // Inverte a direção horizontal do inimigo (movimento para a direita)
+        enemy->position.velX *= -1;
+    } 
+    // Verifica se não há plataforma à direita e o inimigo está se movendo para a direita
+    else if (tileBelowRight == 0 && enemy->position.velX > 0) {
+        // Inverte a direção horizontal do inimigo (movimento para a esquerda)
+        enemy->position.velX *= -1;
+    }
+
 }

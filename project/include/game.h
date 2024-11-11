@@ -3,9 +3,14 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <SDL2/SDL_ttf.h>
+#include "player.h"
 
 #define GRAVIDADE 250.0
 #define DELTA_TIME 0.09
+
+extern Entity player;
+extern SDL_Texture *background;
+
 /**
  * @brief Initializes the game.
  *

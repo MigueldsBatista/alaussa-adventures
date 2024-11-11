@@ -27,4 +27,5 @@ void moveEnemyRight(Entity *entity);
 bool checkEntityBlockCollision(Entity *enemy);
 
 
+
 #endif // !__ENEMY_H__

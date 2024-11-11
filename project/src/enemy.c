@@ -51,18 +51,22 @@ void updateEnemies(SDL_Renderer *renderer) {
         }
         // ↑ esse codigo de cima é pra caso o inimigo esteja fora do chão aplicar a gravidade e essas coisas
         // Movimento
+
         if (enemy->position.onGround) {
-            if (enemy->position.velX == 0) {
+            if (enemy->position.velX == 0 && checkEntityBlockCollision(enemy) == false) {
                 moveEnemyLeft(enemy);
             }
 
             if (checkEntityBlockCollision(enemy)) {
                 if (enemy->position.velX > 0) {
                     moveEnemyLeft(enemy);
-                } else {
+                } 
+                else {
                     moveEnemyRight(enemy);
                 }
             }
+            
+        checkPlatformEdge(enemy);
         }
 
         // Atualiza a posição horizontal do inimigo
@@ -78,7 +82,9 @@ void updateEnemies(SDL_Renderer *renderer) {
 void freeEnemyList() {
     for (int i = 0; i < enemyList.enemyCount; i++) {
         free(enemyList.enemies[i]);
+        printf("Inimigo %d liberado\n", i);
     }
+    
     enemyList.enemyCount = 0;
 }
 

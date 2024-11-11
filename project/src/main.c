@@ -73,10 +73,10 @@ int main(int argc, char* argv[]) {
     while (running) {
         noMenu = mostrarMenu(renderer, font);
         if (!running) break;
-
         // Chama o loop do jogo
         gameLoop(renderer, font);
     }
+
 
     // Libera os recursos do jogo
     freeMusic(bgMusic);
