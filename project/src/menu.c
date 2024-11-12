@@ -143,24 +143,14 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
     }
 
     // Título do jogo
-    const char *titulo = "Aventuras de La Ursa:";
+    const char *titulo = "Alaursa adventures";
     SDL_Color corTitulo = {0, 0, 0, 0}; 
-
-    const char *subTitulo = "Corrida pelo ouro";
-    SDL_Color corSubTitulo = {0, 0, 0, 0};  
     
     // Renderiza o título em uma superfície
     SDL_Surface *tituloSurface = TTF_RenderText_Solid(tituloFont, titulo, corTitulo);
     if (!tituloSurface) {
         printf("Erro ao criar a superfície do título: %s\n", TTF_GetError());
         TTF_CloseFont(tituloFont);
-        return false;
-    }
-
-    SDL_Surface *subTituloSurface = TTF_RenderText_Solid(subTituloFont, subTitulo, corSubTitulo);
-    if (!subTituloSurface) {
-        printf("Erro ao criar a superfície do título: %s\n", TTF_GetError());
-        TTF_CloseFont(subTituloFont);
         return false;
     }
 
@@ -172,21 +162,11 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
         TTF_CloseFont(tituloFont);
         return false;
     }
-    SDL_Texture *subTituloTexture = SDL_CreateTextureFromSurface(renderer, subTituloSurface);
-    if (!subTituloTexture) {
-        printf("Erro ao criar a textura do título: %s\n", SDL_GetError());
-        SDL_FreeSurface(subTituloSurface);
-        TTF_CloseFont(subTituloFont);
-        return false;
-    }
 
-    int tituloLargura, tituloAltura, subTituloLargura, subTituloAltura;
+    int tituloLargura, tituloAltura;
     SDL_QueryTexture(tituloTexture, NULL, NULL, &tituloLargura, &tituloAltura);
-    SDL_QueryTexture(subTituloTexture, NULL,NULL, &subTituloLargura, &subTituloAltura);
 
     SDL_Rect tituloRect = {250, 100, tituloLargura,tituloAltura};
-
-    SDL_Rect subTituloRect = {475, 250, subTituloLargura,subTituloAltura};
 
     Botao botaoJogar = {
         {550, CENTER_HEIGHT - 150, botaoLargura, botaoAltura},
@@ -250,7 +230,6 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
         SDL_RenderCopy(renderer, fundoTexture, NULL, NULL);
         // Renderiza o título
         SDL_RenderCopy(renderer, tituloTexture, NULL, &tituloRect);
-        SDL_RenderCopy(renderer, subTituloTexture, NULL, &subTituloRect);
 
         renderizarBotao(renderer, &botaoJogar, font);
         renderizarBotao(renderer, &botaoInstrucoes, font);
