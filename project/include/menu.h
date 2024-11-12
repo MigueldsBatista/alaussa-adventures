@@ -24,7 +24,7 @@ typedef struct {
     SDL_Point posicao;
     SDL_Color cor;
     char texto[256];
-} Texto;
+} Text;
 
 // Estrutura para armazenar as informações dos jogadores
 // Definição da estrutura Jogador
