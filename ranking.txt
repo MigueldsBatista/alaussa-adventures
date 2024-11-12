@@ -4,3 +4,5 @@ Jogador: vinicius | Pontos: 13519 | Data e Hora: 2024-11-11 18:12:39
 Jogador: giulia | Pontos: 1500 | Data e Hora: 2024-11-11 18:13:59
 Jogador: vinicius | Pontos: 1501 | Data e Hora: 2024-11-11 19:26:56
 Jogador: vini | Pontos: 2504 | Data e Hora: 2024-11-11 20:11:56
+Jogador: vinicius | Pontos: 61 | Data e Hora: 2024-11-11 23:16:42
+Jogador: vinicius | Pontos: 49 | Data e Hora: 2024-11-11 23:26:23
