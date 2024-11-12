@@ -211,7 +211,7 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
                 if (SDL_PointInRect(&(SDL_Point){x, y}, &botaoJogar.rect)) {
-                    capturarNomeJogador(renderer, font);
+                    capturarNomeJogador1(renderer, font);
                     noMenu = false;
                 } else if (SDL_PointInRect(&(SDL_Point){x, y}, &botaoInstrucoes.rect)) {
                     mostrarInstrucoes(renderer, font);
@@ -250,7 +250,7 @@ bool mostrarMenu(SDL_Renderer *renderer, TTF_Font *font) {
 
 // Função para renderizar texto
 void renderizarTexto(SDL_Renderer *renderer, TTF_Font *font, Texto *texto) {
-    SDL_Surface *surface = TTF_RenderText_Solid(font, texto->texto, texto->cor);
+    SDL_Surface *surface = TTF_RenderText_Solid(font, texto->text, texto->cor);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 
     int largura = surface->w;
@@ -526,7 +526,7 @@ void liberarLista(Jogador* head) {
     }
 }
 
-void capturarNomeJogador(SDL_Renderer *renderer, TTF_Font *font) {
+void capturarNomeJogador1(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_Event event;
     bool capturando = true;
     int cursorPos = 0;

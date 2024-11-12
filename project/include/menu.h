@@ -17,7 +17,7 @@ typedef struct {
 typedef struct {
     SDL_Point posicao;
     SDL_Color cor;
-    const char *texto;
+    const char *text;
 } Texto;
 
 typedef struct {
@@ -49,6 +49,6 @@ void liberarLista(Jogador* head);
 void ordenarLista(Jogador** head);
 Jogador* criarJogador(const char* nome, int pontos, const char* dataHora);
 void adicionarJogador(Jogador** head, Jogador* novoJogador);
-
+void capturarNomeJogador1(SDL_Renderer *renderer, TTF_Font *font);
 
 #endif
