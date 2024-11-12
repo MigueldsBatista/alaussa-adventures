@@ -161,6 +161,7 @@ static int currentMap = 0;
         freeEnemyList();
         snprintf(mapFile, sizeof(mapFile), "project/assets/map/map_%d.txt", currentMap); // Formata o nome do próximo mapa
         loadMap(mapFile); // Carrega o próximo mapa
+        curarTrocademapa(player);
         player->position.x = 0; // Reseta a posição do jogador para o início do novo mapa
         printf("Mapa %d\n", currentMap);
     } //else if (player->position.x <= 0 && currentMap > 0) {

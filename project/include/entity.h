@@ -185,5 +185,9 @@ void damageEntity(Entity *entity);
 
 void atualizarImortalidade(Entity *entity, float deltaTime);
 
+void initLifeEntity(Entity *entity, int life_quantity);
+
+void curarTrocademapa(Entity *entity);
+
 
 #endif // !__ENTITY_H__

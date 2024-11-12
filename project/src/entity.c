@@ -79,6 +79,24 @@ void damageEntity(Entity *entity) {
     entity->imortalidadeTimer = 2.0f;  // 2 segundos de imortalidade (ajuste conforme necessário)
 }
 
+void curarTrocademapa(Entity *entity) {
+   
+    Life *novaVida = (Life *)malloc(sizeof(Life));
+    if (!novaVida) {
+        printf("Erro ao alocar memória para nova vida\n");
+        return;
+    }
+    if (entity->head != NULL) {
+        novaVida->id = entity->head->id + 1;
+    } else {
+        novaVida->id = 1;  
+    }
+
+    // Coloca a nova vida no topo da pilha
+    novaVida->prox = entity->head;
+    entity->head = novaVida;
+}
+
 
 void updateEntity(Entity *entity, SDL_Renderer *renderer) {
     // Atualiza a física
