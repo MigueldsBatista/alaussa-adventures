@@ -104,12 +104,7 @@ void checkPlayerEnemyCollision(Entity *player, EnemyList *enemyList) {
     
     for (int i = 0; i < enemyList->enemyCount; i++) {
         Entity *enemy = enemyList->enemies[i];
-        SDL_Rect enemyRect = {
-            (int)enemy->position.x,
-            (int)enemy->position.y,
-            enemy->width,
-            enemy->height
-        };
+        SDL_Rect enemyRect = {(int)enemy->position.x,(int)enemy->position.y,enemy->width,enemy->height};
         if (SDL_HasIntersection(&playerRect, &enemyRect)) {
             if (player->imortalidadeAtiva) {
                 return;

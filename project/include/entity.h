@@ -60,7 +60,6 @@ typedef struct {
     bool imortalidadeAtiva;
     float imortalidadeTimer;
     int moedas;
-
 } Entity;
 
 /**
