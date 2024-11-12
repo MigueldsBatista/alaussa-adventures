@@ -10,7 +10,6 @@
 #include "menu.h"
 const float escala = 0.5; // Ajuste conforme a proporção da tela minimizada
 
-
 Map gameMap;
 
 void loadMap(const char* map_file) {
@@ -177,14 +176,14 @@ static int currentMap = 0;
     renderMap(renderer);
 }
 
-void checkCoinCollected(Entity*player, SDL_Renderer *renderer){
+void checkCoinCollected(Entity *player, SDL_Renderer *renderer) {
     SDL_Rect playerRect = {
         (int)player->position.x,
         (int)player->position.y,
         player->width,
         player->height
     };
-     
+
     for (int y = 0; y < gameMap.height; y++) {
         for (int x = 0; x < gameMap.width; x++) {
             if (gameMap.tiles[y][x] == 3) {
@@ -197,12 +196,27 @@ void checkCoinCollected(Entity*player, SDL_Renderer *renderer){
 
                 if (SDL_HasIntersection(&playerRect, &coinRect)) {
                     player->moedas++;
-                    gameMap.tiles[y][x] = 0;
+                    if (player->moedas % 5 == 0) { 
+                        Life *novaVida = (Life *)malloc(sizeof(Life));
+                        if (!novaVida) {
+                            printf("Erro ao alocar memória para nova vida\n");
+                            return;
+                        }
+                        if (player->head != NULL) {
+                            novaVida->id = player->head->id + 1;
+                        } else {
+                            novaVida->id = 1;  
+                        }
+                        novaVida->prox = player->head;
+                        player->head = novaVida;
+                    }
+                    gameMap.tiles[y][x] = 0;  // Remove a moeda do mapa
                 }
             }
         }
     }
 }
+
 
 bool checkPlayerInFinishPosition(Entity *player, SDL_Renderer *renderer, TTF_Font *font) {
     SDL_Rect playerRect = {
@@ -230,7 +244,6 @@ bool checkPlayerInFinishPosition(Entity *player, SDL_Renderer *renderer, TTF_Fon
     }
     return false;
 }
-
 
 void updateEnemyMovement(Entity *enemy) {
     SDL_Rect enemyRect = {
@@ -278,8 +291,6 @@ void updateEnemyMovement(Entity *enemy) {
     // Atualizar a posição do inimigo
     enemy->position.x += enemy->position.velX;
 }
-
-
 
 void checkPlatformEdge(Entity *enemy) {
     // Cálculo do tile abaixo da borda esquerda do inimigo
