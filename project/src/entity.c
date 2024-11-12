@@ -265,9 +265,8 @@ void loadAnimationFrames(Entity *entity, Action action, SDL_Renderer *renderer) 
             } else if (action == MOVE_RIGHT) {
                 sprintf(filename, "project/assets/MovEnemy/enemy_move_right_%d.png", i);
             }// else if (action == IDLE) {
-             //   sprintf(filename, "project/assets/MovEnemy/enemy_idle_%d.png", i);
+            //   sprintf(filename, "project/assets/MovEnemy/enemy_idle_%d.png", i);
             //}
-            
             else{
                 sprintf(filename, "project/assets/MovEnemy/enemy_idle_%d.png", i);
             }
