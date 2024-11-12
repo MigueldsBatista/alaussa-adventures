@@ -469,6 +469,141 @@ void mostrarMenuFimDeJogo(SDL_Renderer *renderer, TTF_Font *font) {
     }
 }
 
+// Função para criar um novo jogador
+Jogador* criarJogador(const char* nome, int pontos, const char* dataHora) {
+    Jogador* novoJogador = (Jogador*)malloc(sizeof(Jogador));
+    strcpy(novoJogador->nome, nome);
+    novoJogador->pontos = pontos;
+    strcpy(novoJogador->dataHora, dataHora);
+    novoJogador->prox = NULL;
+    return novoJogador;
+}
+
+// Função para adicionar um jogador à lista encadeada
+void adicionarJogador(Jogador** head, Jogador* novoJogador) {
+    if (*head == NULL) {
+        *head = novoJogador;
+    } else {
+        Jogador* temp = *head;
+        while (temp->prox != NULL) {
+            temp = temp->prox;
+        }
+        temp->prox = novoJogador;
+    }
+}
+
+// Função para ordenar a lista de jogadores por pontuação (maior para menor)
+void ordenarLista(Jogador** head) {
+    if (*head == NULL) return;
+
+    for (Jogador* i = *head; i != NULL; i = i->prox) {
+        for (Jogador* j = i->prox; j != NULL; j = j->prox) {
+            if (i->pontos < j->pontos) {
+                // Troca as informações dos jogadores
+                int tempPontos = i->pontos;
+                char tempNome[50], tempDataHora[100];
+                strcpy(tempNome, i->nome);
+                strcpy(tempDataHora, i->dataHora);
+
+                i->pontos = j->pontos;
+                strcpy(i->nome, j->nome);
+                strcpy(i->dataHora, j->dataHora);
+
+                j->pontos = tempPontos;
+                strcpy(j->nome, tempNome);
+                strcpy(j->dataHora, tempDataHora);
+            }
+        }
+    }
+}
+
+// Função para liberar a memória da lista encadeada
+void liberarLista(Jogador* head) {
+    while (head != NULL) {
+        Jogador* temp = head;
+        head = head->prox;
+        free(temp);
+    }
+}
+
+void capturarNomeJogador(SDL_Renderer *renderer, TTF_Font *font) {
+    SDL_Event event;
+    bool capturando = true;
+    int cursorPos = 0;
+    memset(playerName, 0, sizeof(playerName));
+
+    SDL_StartTextInput();  // Inicia o modo de entrada de texto
+
+    while (capturando) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                capturando = false;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN) {
+                capturando = false;
+            } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_BACKSPACE && cursorPos > 0) {
+                playerName[--cursorPos] = '\0';
+            } else if (event.type == SDL_TEXTINPUT && cursorPos < MAX_NAME_LENGTH - 1) {
+                strncat(playerName, event.text.text, 1);
+                cursorPos++;
+            }
+        }
+
+        // Renderização (exibição do nome do jogador e instruções)
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        
+        SDL_Rect inputFieldRect = {
+            (SCREEN_WIDTH - 400) / 2, (SCREEN_HEIGHT - 100) / 2, 400, 100
+        };
+        SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
+        SDL_RenderFillRect(renderer, &inputFieldRect);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDrawRect(renderer, &inputFieldRect);
+
+        // Renderiza as instruções
+        SDL_Surface *instrucaoSurface = TTF_RenderText_Solid(font, "Digite seu nome e pressione Enter:", corBranca);
+        if (instrucaoSurface) {
+            SDL_Texture *instrucaoTexture = SDL_CreateTextureFromSurface(renderer, instrucaoSurface);
+            SDL_FreeSurface(instrucaoSurface);
+            if (instrucaoTexture) {
+                int instrucaoWidth, instrucaoHeight;
+                SDL_QueryTexture(instrucaoTexture, NULL, NULL, &instrucaoWidth, &instrucaoHeight);
+                SDL_Rect instrucaoRect = {
+                    (SCREEN_WIDTH - instrucaoWidth) / 2,
+                    (SCREEN_HEIGHT - 100) / 2 - 50,
+                    instrucaoWidth,
+                    instrucaoHeight
+                };
+                SDL_RenderCopy(renderer, instrucaoTexture, NULL, &instrucaoRect);
+                SDL_DestroyTexture(instrucaoTexture);
+            }
+        }
+
+        // Renderiza o nome digitado
+        SDL_Surface *surface = TTF_RenderText_Solid(font, playerName, corBranca);
+        if (surface) {
+            SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+            SDL_FreeSurface(surface);
+            if (texture) {
+                int textWidth, textHeight;
+                SDL_QueryTexture(texture, NULL, NULL, &textWidth, &textHeight);
+                SDL_Rect textRect = {
+                    inputFieldRect.x + (inputFieldRect.w - textWidth) / 2,
+                    inputFieldRect.y + (inputFieldRect.h - textHeight) / 2,
+                    textWidth, textHeight
+                };
+                SDL_RenderCopy(renderer, texture, NULL, &textRect);
+                SDL_DestroyTexture(texture);
+            }
+        }
+
+        SDL_RenderPresent(renderer);
+    }
+
+    SDL_StopTextInput();  // Finaliza o modo de entrada de texto
+}
+
+
 void mostrarRanking(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_RenderClear(renderer);
 
@@ -481,42 +616,30 @@ void mostrarRanking(SDL_Renderer *renderer, TTF_Font *font) {
     char linha[256];
     int deslocamentoY = 30;  // Espaçamento entre as linhas do ranking
 
-    // Estrutura para armazenar as informações dos jogadores
-    typedef struct {
-        char nome[50];
-        int pontos;
-        char dataHora[100];
-    } Jogador;
+    // Lista encadeada para armazenar os jogadores
+    Jogador* head = NULL;
 
-    Jogador jogadores[100];
-    int numJogadores = 0;
-
-    // Lê as informações do arquivo e armazena na estrutura
+    // Lê as informações do arquivo e armazena na lista encadeada
     while (fgets(linha, sizeof(linha), file)) {
-        sscanf(linha, "Jogador: %[^|]| Pontos: %d | Data e Hora: %[^\n]", jogadores[numJogadores].nome, &jogadores[numJogadores].pontos, jogadores[numJogadores].dataHora);
-        numJogadores++;
+        Jogador* novoJogador = (Jogador*)malloc(sizeof(Jogador));
+        sscanf(linha, "Jogador: %[^|]| Pontos: %d | Data e Hora: %[^\n]", novoJogador->nome, &novoJogador->pontos, novoJogador->dataHora);
+        novoJogador->prox = NULL;
+        adicionarJogador(&head, novoJogador);
     }
 
-    // Ordena os jogadores por pontuação (maior para menor)
-    for (int i = 0; i < numJogadores - 1; i++) {
-        for (int j = i + 1; j < numJogadores; j++) {
-            if (jogadores[i].pontos < jogadores[j].pontos) {
-                Jogador temp = jogadores[i];
-                jogadores[i] = jogadores[j];
-                jogadores[j] = temp;
-            }
-        }
-    }
+    // Ordena os jogadores por pontuação
+    ordenarLista(&head);
 
     int posicaoRanking = 1;
     SDL_Color corBranca = {255, 255, 255, 255};
     SDL_Point posicaoInicial = {0, 50};  // Posição inicial para o texto do ranking, centralizado
 
     // Renderiza os jogadores ordenados e centralizados
-    for (int i = 0; i < numJogadores && i < 10; i++) {
+    Jogador* atual = head;
+    for (int i = 0; i < 10 && atual != NULL; i++) {
         char texto[256];
-        snprintf(texto, sizeof(texto), " %d  Jogador: %s | Pontos: %d | Data e Hora: %s", posicaoRanking, jogadores[i].nome, jogadores[i].pontos, jogadores[i].dataHora);
-        
+        snprintf(texto, sizeof(texto), " %d  Jogador: %s | Pontos: %d | Data e Hora: %s", posicaoRanking, atual->nome, atual->pontos, atual->dataHora);
+
         int textoWidth, textoHeight;
         TTF_SizeText(font, texto, &textoWidth, &textoHeight);
 
@@ -527,8 +650,9 @@ void mostrarRanking(SDL_Renderer *renderer, TTF_Font *font) {
 
         Texto textoRanking = {posicaoCentralizada, corBranca, texto};
         renderizarTexto(renderer, font, &textoRanking);
-        
+
         posicaoRanking++;
+        atual = atual->prox;
     }
 
     fclose(file);
@@ -549,4 +673,6 @@ void mostrarRanking(SDL_Renderer *renderer, TTF_Font *font) {
             }
         }
     }
+
+    liberarLista(head);
 }
