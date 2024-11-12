@@ -80,7 +80,6 @@ void damageEntity(Entity *entity) {
 }
 
 void curarTrocademapa(Entity *entity) {
-   
     Life *novaVida = (Life *)malloc(sizeof(Life));
     if (!novaVida) {
         printf("Erro ao alocar memória para nova vida\n");
@@ -91,12 +90,10 @@ void curarTrocademapa(Entity *entity) {
     } else {
         novaVida->id = 1;  
     }
-
     // Coloca a nova vida no topo da pilha
     novaVida->prox = entity->head;
     entity->head = novaVida;
 }
-
 
 void updateEntity(Entity *entity, SDL_Renderer *renderer) {
     // Atualiza a física
