@@ -12,12 +12,12 @@ A La Ursa quer dinheiro quem não dá é pirangueiro! Nosso jogo é baseado em S
 ### Pré-requisitos
 - [Compilador C](https://gcc.gnu.org/)
 - Maquina Virtual Linux ou o próprio Linux
-- [baixar as bibliotecas de requirements.txt](https://github.com/xTvini/JogoAED/blob/main/requirements.txt)
+- [baixar as bibliotecas de requirements.txt](https://github.com/xTvini/Jogo-3-Periodo/blob/main/requirements.txt)
 
 ### Compilação
 1. Clone este repositório:
     ```sh
-    git clone https://github.com/xTvini/JogoAED.git
+    git clone https://github.com/xTvini/Jogo-3-Periodo.git
     ```
 2. Navegue até o diretório do projeto:
 caso tenha criado alguma pasta entre na pasta onde está clonado nosso GIT
