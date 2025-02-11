@@ -8,6 +8,9 @@
 ## Descrição
 A La Ursa quer dinheiro quem não dá é pirangueiro! Nosso jogo é baseado em Super Mario Brothers, com a diferença que, como o jingle fala, a La Ursa quer dinheiro. Assim, o objetivo é coletar o máximo de moedas possíveis, completando vários parkours e chegando ao ponto de chegada marcado pela icônica Torre de cristal.
 
+
+<img src="Alaussa.gif" width="700" alt="Gif do jogo">
+
 ## Instalação
 ### Pré-requisitos
 - [Compilador C](https://gcc.gnu.org/)
